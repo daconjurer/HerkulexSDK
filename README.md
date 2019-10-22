@@ -24,12 +24,7 @@ to compile the dynamic library. And then
 sudo make install
 ```
 
-to install the library on your */usr/local* directory. Then you can start using the library by including the header
-
-```
-"herkulex_sdk.h"
-```
-in your *.cpp* files.
+to install the library on your */usr/local* directory. Then you can start using the library by including the header *"herkulex_sdk.h"* in your *.cpp* files.
 
 ## Running the examples
 
@@ -45,6 +40,6 @@ This project is licensed under the BSD 3-Clause License - see the [LICENSE.md](L
 
 ## Acknowledgments
 
-* The code is strongly based on the ROBOTIS Dynamixel SDK (Protocol1.0/2.0) https://github.com/ROBOTIS-GIT/DynamixelSDK part of the ROBOTIS Official GitHub ([ROBOTIS-GIT](https://github.com/ROBOTIS-GIT))
+* The code is strongly based on the ROBOTIS Dynamixel SDK (Protocol1.0/2.0) https://github.com/ROBOTIS-GIT/DynamixelSDK part of the ROBOTIS Official GitHub ([ROBOTIS-GIT](https://github.com/ROBOTIS-GIT)).
 
 
