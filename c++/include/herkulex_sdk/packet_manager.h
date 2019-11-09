@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
@@ -32,6 +33,23 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
+=======
+/*******************************************************************************
+* Copyright 2018 Robótica de la Mixteca
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*******************************************************************************/
+>>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
 
 ////////////////////////////////////////////
 /// @file Hovis HerkuleX Packets manager
@@ -84,7 +102,11 @@ class PacketManager
     // methods
     int sendPacket (int verbose);
     int sendreceivePacket (int verbose, int ack_length);
+<<<<<<< HEAD
     char* buildUp (std::vector<uint8_t> bytes);
+=======
+    char *buildUp (std::vector<uint8_t> bytes);
+>>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
     uint8_t checkSum1 (std::vector<uint8_t> bytes, uint8_t& cs1);
     uint8_t checkSum2 (uint8_t cs1, uint8_t& cs2);
 
@@ -96,10 +118,17 @@ class PacketManager
     int sendTx (int length, std::vector<uint8_t> buf, int ID, int& verb);
     int sendTxSync (int length, std::vector<uint8_t> buf, int& verb);
     int sendTxRx (int length, std::vector<uint8_t> buf, int ack_length, int ID, int& verb);
+<<<<<<< HEAD
     bool setPortLabel (char* portlabel);
 
     std::vector<uint8_t> getData ();
     std::vector<uint8_t> getACKPacket ();
+=======
+    bool setPortLabel (const char* portlabel);
+
+    std::vector<uint8_t> getData ();
+    std::vector<uint8_t> getAckPacket ();
+>>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
 
     bool resizeData (int length);
 };

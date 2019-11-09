@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
@@ -40,11 +41,31 @@
 ///
 /// @author Victor Esteban Sandoval-Luna
 ////////////////////////////////////////////////////////
+=======
+/*******************************************************************************
+* Copyright 2018 Robótica de la Mixteca
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*******************************************************************************/
+
+/* Author: Victor Esteban Sandoval-Luna */
+>>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
 
 #include "../../include/herkulex_sdk/port_handler.h"
 
 using namespace herkulex;
 
+<<<<<<< HEAD
 
 // Constructors
 PortHandler::PortHandler () 
@@ -99,6 +120,58 @@ int PortHandler::setBaudRate (const int& baudrate)
   // Considering both Hovis HerkuleX servos limits and TTL hardware limits (up to 500000 bps)
   int br = -1;
   
+=======
+// Constructors
+PortHandler::PortHandler () {
+  port_name = (char*)"/dev/ttyUSB0";
+  socket_fd = -1;
+  setBaudRate(115200);
+}
+
+PortHandler::PortHandler (const char *portname) {
+  port_name = (char*)portname;
+  socket_fd = -1;
+  setBaudRate(115200);
+}
+
+bool PortHandler::openPort () {
+  socket_fd = open (port_name, O_RDWR | O_NOCTTY | O_SYNC);
+
+  if (socket_fd < 0) {
+    std::cout << "Error opening " << port_name << ": "<< std::strerror(errno) <<  std::endl;
+    return false;
+  }
+
+  setInterfaceAttribs(socket_fd, baudrate_, 0);
+  setBlocking(socket_fd, 0);
+  tcflush(socket_fd, TCIFLUSH);
+
+  return true;
+}
+
+void PortHandler::closePort () {
+  if(socket_fd != -1)
+    close(socket_fd);
+  socket_fd = -1;
+}
+
+void PortHandler::clearPort () {
+  tcflush(socket_fd, TCIFLUSH);
+}
+
+void PortHandler::setPortName (const char* portname) {
+  port_name = (char*)portname;
+}
+
+char* PortHandler::getPortName () {
+  return port_name;
+}
+
+int PortHandler::setBaudRate (const int baudrate) {
+  // Considering both Hovis HerkuleX servos limits and TTL hardware limits (up to 500000 bps)
+  int br = -1;
+
+>>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
   switch (baudrate) {
     case 9600:
       baudrate_ = B9600;
@@ -125,11 +198,16 @@ int PortHandler::setBaudRate (const int& baudrate)
       baudrate_ = B115200;
       br = 0;
   }
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
   if (br == -1) {
     std::cout << "Error setting baudrate: Invalid baudrate." << std::endl;
     return br;
   }
+<<<<<<< HEAD
   
   return baudrate;
 }
@@ -146,6 +224,32 @@ int PortHandler::writePort (uint8_t* const packet, const int& length)
 
 int PortHandler::setInterfaceAttribs (const int& fd, const int& baudrate, const int& parity)
 {
+=======
+
+  return baudrate;
+}
+
+int PortHandler::getBaudRate ()
+{
+  return remapBaudRate(baudrate_);
+}
+
+int PortHandler::getBytesAvailable () {
+  int bytes_available;
+  ioctl(socket_fd, FIONREAD, &bytes_available);
+  return bytes_available;
+}
+
+int PortHandler::readPort (uint8_t *packet, int length) {
+  return read(socket_fd, packet, length);
+}
+
+int PortHandler::writePort (uint8_t *packet, int length) {
+  return write(socket_fd, packet, length);
+}
+
+int PortHandler::setInterfaceAttribs (int fd, int baudrate, int parity) {
+>>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
   struct termios tty;
   memset(&tty, 0, sizeof tty);
 
@@ -189,3 +293,42 @@ int PortHandler::setInterfaceAttribs (const int& fd, const int& baudrate, const 
   return 0;
 }
 
+<<<<<<< HEAD
+=======
+void PortHandler::setBlocking (int fd, int block) {
+  struct termios tty;
+  memset(&tty, 0, sizeof tty);
+
+  if (tcgetattr(fd, &tty) != 0) {
+    std::cout << "Error " << std::strerror(errno) << " from tggetattr.\n";
+    return;
+  }
+
+  tty.c_cc[VMIN]  = block ? 1 : 0;
+  tty.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
+
+  if (tcsetattr(fd, TCSANOW, &tty) != 0)
+    std::cout << "Error " << std::strerror(errno) << " setting termios attributes.\n";
+}
+
+int PortHandler::remapBaudRate (const int baudrate) {
+  switch (baudrate) {
+    case B9600:
+      return 9600;
+    case B19200:
+      return 19200;
+    case B38400:
+      return 38400;
+    case B57600:
+      return 57600;
+    case B115200:
+      return 115200;
+    case B230400:
+      return 230400;
+    case B460800:
+      return 460800;
+    default:
+      return -1;
+  }
+}
+>>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
