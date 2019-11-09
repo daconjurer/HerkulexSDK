@@ -1,20 +1,45 @@
-/*******************************************************************************
-* Copyright 2018 Robótica de la Mixteca
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*******************************************************************************/
+/*********************************************************************
+ * Software License Agreement (BSD License)
+ *
+ *  Copyright (c) 2019, Robótica de la Mixteca
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above
+ *     copyright notice, this list of conditions and the following
+ *     disclaimer in the documentation and/or other materials provided
+ *     with the distribution.
+ *   * Neither the name of Universidad Tecnológica de la Mixteca nor
+ *     the names of its contributors may be used to endorse or promote
+ *     products derived from this software without specific prior
+ *     written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ *********************************************************************/
 
-/* Author: Victor Esteban Sandoval-Luna */
+////////////////////////////////////////////////////////
+/// @file Serial read and write port handler. It uses
+/// a generic FTDI USB-to-TTL converter and has been
+/// tested on Linux.
+///
+/// @author Victor Esteban Sandoval-Luna
+////////////////////////////////////////////////////////
 
 #include "../../include/herkulex_sdk/port_handler.h"
 
@@ -22,48 +47,47 @@ using namespace herkulex;
 
 // Constructors
 PortHandler::PortHandler () {
-  port_name = (char*)"/dev/ttyUSB0";
-  socket_fd = -1;
+  port_name_ = (char*)"/dev/ttyUSB0";
+  socket_fd_ = -1;
   setBaudRate(115200);
 }
 
 PortHandler::PortHandler (const char *portname) {
-  port_name = (char*)portname;
-  socket_fd = -1;
+  port_name_ = (char*)portname;
+  socket_fd_ = -1;
   setBaudRate(115200);
 }
 
 bool PortHandler::openPort () {
-  socket_fd = open (port_name, O_RDWR | O_NOCTTY | O_SYNC);
+  socket_fd_ = open (port_name_, O_RDWR | O_NOCTTY | O_SYNC);
 
-  if (socket_fd < 0) {
-    std::cout << "Error opening " << port_name << ": "<< std::strerror(errno) <<  std::endl;
+  if (socket_fd_ < 0) {
+    std::cout << "Error opening " << port_name_ << ": "<< std::strerror(errno) <<  std::endl;
     return false;
   }
 
-  setInterfaceAttribs(socket_fd, baudrate_, 0);
-  setBlocking(socket_fd, 0);
-  tcflush(socket_fd, TCIFLUSH);
+  setInterfaceAttribs(socket_fd_, baudrate_, 0);
+  tcflush(socket_fd_, TCIFLUSH);
 
   return true;
 }
 
 void PortHandler::closePort () {
-  if(socket_fd != -1)
-    close(socket_fd);
-  socket_fd = -1;
+  if(socket_fd_ != -1)
+    close(socket_fd_);
+  socket_fd_ = -1;
 }
 
 void PortHandler::clearPort () {
-  tcflush(socket_fd, TCIFLUSH);
+  tcflush(socket_fd_, TCIFLUSH);
 }
 
 void PortHandler::setPortName (const char* portname) {
-  port_name = (char*)portname;
+  port_name_ = (char*)portname;
 }
 
 char* PortHandler::getPortName () {
-  return port_name;
+  return port_name_;
 }
 
 int PortHandler::setBaudRate (const int baudrate) {
@@ -112,16 +136,16 @@ int PortHandler::getBaudRate ()
 
 int PortHandler::getBytesAvailable () {
   int bytes_available;
-  ioctl(socket_fd, FIONREAD, &bytes_available);
+  ioctl(socket_fd_, FIONREAD, &bytes_available);
   return bytes_available;
 }
 
 int PortHandler::readPort (uint8_t *packet, int length) {
-  return read(socket_fd, packet, length);
+  return read(socket_fd_, packet, length);
 }
 
 int PortHandler::writePort (uint8_t *packet, int length) {
-  return write(socket_fd, packet, length);
+  return write(socket_fd_, packet, length);
 }
 
 int PortHandler::setInterfaceAttribs (int fd, int baudrate, int parity) {
@@ -166,22 +190,6 @@ int PortHandler::setInterfaceAttribs (int fd, int baudrate, int parity) {
   }
 
   return 0;
-}
-
-void PortHandler::setBlocking (int fd, int block) {
-  struct termios tty;
-  memset(&tty, 0, sizeof tty);
-
-  if (tcgetattr(fd, &tty) != 0) {
-    std::cout << "Error " << std::strerror(errno) << " from tggetattr.\n";
-    return;
-  }
-
-  tty.c_cc[VMIN]  = block ? 1 : 0;
-  tty.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
-
-  if (tcsetattr(fd, TCSANOW, &tty) != 0)
-    std::cout << "Error " << std::strerror(errno) << " setting termios attributes.\n";
 }
 
 int PortHandler::remapBaudRate (const int baudrate) {
