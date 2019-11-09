@@ -44,8 +44,11 @@
 #include <iostream>
 #include <cerrno>
 #include <fcntl.h>
+#include <string.h>
+#include <cstring>
 #include <termios.h>
 #include <unistd.h>
+#include <sys/ioctl.h>
 
 namespace herkulex
 {
@@ -53,63 +56,51 @@ namespace herkulex
 class PortHandler
 {
   private:
-    // ATTRIBUTES
+    // Attributes
     char* port_name_;
     int socket_fd_;
     int baudrate_;
-
-    // methods
-    double getCurrentTime();
-    double getTimeSinceStart();
-
+    
     // Sets the attributes of the serial interface
-    int setInterfaceAttribs (int fd, int baudrate, int parity);
-
-    int remapBaudRate(const int baudrate);
-
-  public:
+    int setInterfaceAttribs (const int& fd, const int& baudrate, const int& parity);
+    
     // Default HerkuleX Baudrate
     const int DEFAULT_BAUDRATE = 115200;
-
+    
+  public:
     // Constructors
     PortHandler ();
-
-    PortHandler (const char *portname);
-
+    PortHandler (char* portname, const int& baudrate);
+    
     virtual ~PortHandler() { }
-
+    
     // Opens the serial port
     bool openPort();
-
+    
     // Closes the serial port
     void closePort();
-
-    // Clears the port
+    
+    // Clears up the port
     void clearPort();
-
+    
     // Sets the name of the port
-    void setPortName(const char* port_name);
-
+    void setPortName(char* port_name);
+    
     // Gets the name of the port
-    char *getPortName ();
-
+    char* getPortName ();
+    
     // Sets the baudrate of the port
-    int setBaudRate(const int baudrate);
-
-    // Gets the baudrate of the port
-    int getBaudRate();
-
-    // Gets the number of bits available for reading from the port buffer
-    int getBytesAvailable();
-
+    int setBaudRate(const int& baudrate);
+    
     // Reads port
-    int readPort(uint8_t *packet, int length);
-
+    int readPort(uint8_t* packet, const int& length);
+    
     // Writes to port
-    int writePort(uint8_t *packet, int length);
-
+    int writePort(uint8_t* packet, const int& length);
+    
 };
 
 }
 
 #endif
+

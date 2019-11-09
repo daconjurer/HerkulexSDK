@@ -96,7 +96,7 @@ class PacketManager
     int sendTx (int length, std::vector<uint8_t> buf, int ID, int& verb);
     int sendTxSync (int length, std::vector<uint8_t> buf, int& verb);
     int sendTxRx (int length, std::vector<uint8_t> buf, int ack_length, int ID, int& verb);
-    bool setPortLabel (const char* portlabel);
+    bool setPortLabel (char* portlabel);
 
     std::vector<uint8_t> getData ();
     std::vector<uint8_t> getACKPacket ();
