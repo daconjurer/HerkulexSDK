@@ -1,47 +1,3 @@
-<<<<<<< HEAD
-/*********************************************************************
- * Software License Agreement (BSD License)
- *
- *  Copyright (c) 2019, Robótica de la Mixteca
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above
- *     copyright notice, this list of conditions and the following
- *     disclaimer in the documentation and/or other materials provided
- *     with the distribution.
- *   * Neither the name of Universidad Tecnológica de la Mixteca nor
- *     the names of its contributors may be used to endorse or promote
- *     products derived from this software without specific prior
- *     written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- *  POSSIBILITY OF SUCH DAMAGE.
- *********************************************************************/
-
-////////////////////////////////////////////////////////
-/// @file Herkulex servos user class. This is a user
-/// library for the Hovis HerkuleX servomotors. So far
-/// tested with the DRS-0101/0201 and DRS-0601 models.
-///
-/// @author Victor Esteban Sandoval-Luna
-////////////////////////////////////////////////////////
-=======
 /*******************************************************************************
 * Copyright 2018 Robótica de la Mixteca
 *
@@ -62,7 +18,6 @@
 
 #include <stdexcept>
 using std::runtime_error;
->>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
 
 #include "../../include/herkulex_sdk/servo_herkulex.h"
 
@@ -126,11 +81,7 @@ bool ServoHerkulex::ping ()
     k = pingID(j);
 
     if (k == 12) {
-<<<<<<< HEAD
-      packet = manager.getACKPacket();
-=======
       packet = manager.getAckPacket();
->>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
       id = packet[9];
       std::cout << "Herkulex [" << id << "] UP" << std::endl;
       n = n+1;
@@ -176,11 +127,7 @@ std::vector<uint8_t> ServoHerkulex::getStatus (int tID)
   std::vector<uint8_t> stat;
   buf[1] = (uint8_t)tID;
   sendData(buf, 9);
-<<<<<<< HEAD
-  stat = manager.getACKPacket();
-=======
   stat = manager.getAckPacket();
->>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
 
   if (verbose_) {
     for (unsigned int j = 0; j < stat.size(); j++) {
@@ -617,11 +564,7 @@ uint16_t ServoHerkulex::getPosition0201 (int tID)
   buf[1] = (uint8_t)tID;
   sendData(buf, 13);
 
-<<<<<<< HEAD
-  ack = manager.getACKPacket();
-=======
   ack = manager.getAckPacket();
->>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
 
   pos = ((ack[10]&0x03) << 8) | ack[9];
 
@@ -637,11 +580,7 @@ uint16_t ServoHerkulex::getPosition0601 (int tID)
   buf[1] = (uint8_t)tID;
   sendData(buf, 13);
 
-<<<<<<< HEAD
-  ack = manager.getACKPacket();
-=======
   ack = manager.getAckPacket();
->>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
 
   pos = ((ack[10]&0x07) << 8) | ack[9];
 
@@ -657,11 +596,7 @@ int ServoHerkulex::getSpeed (int tID)
   buf[1] = (uint8_t)tID;
   sendData(buf, 13);
 
-<<<<<<< HEAD
-  ack = manager.getACKPacket();
-=======
   ack = manager.getAckPacket();
->>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
 
   sp = ((ack[10]&0xFF) << 8) | ack[9];
 
