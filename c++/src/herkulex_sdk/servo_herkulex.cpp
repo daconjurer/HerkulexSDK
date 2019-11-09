@@ -1,23 +1,45 @@
-/*******************************************************************************
-* Copyright 2018 Robótica de la Mixteca
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*******************************************************************************/
+/*********************************************************************
+ * Software License Agreement (BSD License)
+ *
+ *  Copyright (c) 2019, Robótica de la Mixteca
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above
+ *     copyright notice, this list of conditions and the following
+ *     disclaimer in the documentation and/or other materials provided
+ *     with the distribution.
+ *   * Neither the name of Universidad Tecnológica de la Mixteca nor
+ *     the names of its contributors may be used to endorse or promote
+ *     products derived from this software without specific prior
+ *     written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ *********************************************************************/
 
-/* Author: Victor Esteban Sandoval-Luna */
-
-#include <stdexcept>
-using std::runtime_error;
+////////////////////////////////////////////////////////
+/// @file Herkulex servos user class. This is a user
+/// library for the Hovis HerkuleX servomotors. So far
+/// tested with the DRS-0101/0201 and DRS-0601 models.
+///
+/// @author Victor Esteban Sandoval-Luna
+////////////////////////////////////////////////////////
 
 #include "../../include/herkulex_sdk/servo_herkulex.h"
 
@@ -28,20 +50,23 @@ using std::runtime_error;
 
 using namespace herkulex;
 
-ServoHerkulex::ServoHerkulex (int verb) {
+ServoHerkulex::ServoHerkulex (int verb)
+{
   // default yet never used in the application
   ID[0] = 0;
   model[0] = H0201;
   verbose_ = verb;
 }
 
-ServoHerkulex::ServoHerkulex (int sID, const char *smodel, int verb) {
+ServoHerkulex::ServoHerkulex (int sID, const char *smodel, int verb)
+{
   ID[0] = sID;
   model[0] = mapModel(smodel);
   verbose_ = verb;
 }
 
-ServoHerkulex::ServoHerkulex (std::vector<int> sIDs, std::vector<std::string> smodels, int verb) {
+ServoHerkulex::ServoHerkulex (std::vector<int> sIDs, std::vector<std::string> smodels, int verb)
+{
   int size = sIDs.size();
 
   ID.resize(size);
@@ -54,11 +79,13 @@ ServoHerkulex::ServoHerkulex (std::vector<int> sIDs, std::vector<std::string> sm
   verbose_ = verb;
 }
 
-bool ServoHerkulex::setPortLabel (const char* label) {
+bool ServoHerkulex::setPortLabel (const char* label)
+{
   return manager.setPortLabel(label);
 }
 
-bool ServoHerkulex::reboot (int tID) {
+bool ServoHerkulex::reboot (int tID)
+{
   std::vector<uint8_t> buf = {0x07, 0x00, HX_REBOOT};  // Reboot sequence
   buf[1] = (uint8_t)tID;
   sendData(buf);
@@ -66,7 +93,8 @@ bool ServoHerkulex::reboot (int tID) {
   return true;
 }
 
-bool ServoHerkulex::ping () {
+bool ServoHerkulex::ping ()
+{
   int k = 0, n = 0, id = 0;
   std::vector<uint8_t> packet = std::vector<uint8_t> (12);
 
@@ -75,7 +103,7 @@ bool ServoHerkulex::ping () {
     k = pingID(j);
 
     if (k == 12) {
-      packet = manager.getAckPacket();
+      packet = manager.getACKPacket();
       id = packet[9];
       std::cout << "Herkulex [" << id << "] UP" << std::endl;
       n = n+1;
@@ -92,7 +120,8 @@ bool ServoHerkulex::ping () {
   return true;
 }
 
-bool ServoHerkulex::setID (int tID, int nID){
+bool ServoHerkulex::setID (int tID, int nID)
+{
   std::vector<uint8_t> buf = {0x0A, 0x00, 0x03, 0x35, 0x01, 0x01};  // LED Green
   buf[1] = (uint8_t)tID;
   sendData(buf);
@@ -100,7 +129,8 @@ bool ServoHerkulex::setID (int tID, int nID){
   return true;
 }
 
-bool ServoHerkulex::clearError (int tID) {
+bool ServoHerkulex::clearError (int tID)
+{
   std::vector<uint8_t> buf = {0x0B, 0x00, 0x03, 0x30, 0x02, 0x00, 0x00};  // Clear Error
   buf[1] = (uint8_t)tID;
   sendData(buf);
@@ -113,15 +143,16 @@ bool ServoHerkulex::clearError (int tID) {
   return true;
 }
 
-std::vector<uint8_t> ServoHerkulex::getStatus (int tID) {
+std::vector<uint8_t> ServoHerkulex::getStatus (int tID)
+{
   std::vector<uint8_t> buf = {0x07, 0x00, 0x07};
   std::vector<uint8_t> stat;
   buf[1] = (uint8_t)tID;
   sendData(buf, 9);
-  stat = manager.getAckPacket();
+  stat = manager.getACKPacket();
 
   if (verbose_) {
-    for (int j = 0; j < stat.size(); j++) {
+    for (unsigned int j = 0; j < stat.size(); j++) {
       printf("%X ",stat[j]);
     }
     printf("\n");
@@ -130,7 +161,8 @@ std::vector<uint8_t> ServoHerkulex::getStatus (int tID) {
   return stat;
 }
 
-bool ServoHerkulex::setACK (int ACK) {
+bool ServoHerkulex::setACK (int ACK)
+{
   std::vector<uint8_t> buf = {0x0A, 0xFE, 0x03, 0x34, 0x01, 0x01};
   // 0 = no reply, 1 = reply to READ CMDs only, 2 = always reply
   buf[5] = (uint8_t)ACK;
@@ -139,7 +171,8 @@ bool ServoHerkulex::setACK (int ACK) {
   return true;
 }
 
-bool ServoHerkulex::torqueOn (int tID) {
+bool ServoHerkulex::torqueOn (int tID)
+{
   std::vector<uint8_t> buf = {0x0A, 0x00, 0x03, 0x34, 0x01, 0x60};
   buf[1] = (uint8_t)tID;
   sendData(buf);
@@ -147,7 +180,8 @@ bool ServoHerkulex::torqueOn (int tID) {
   return true;
 }
 
-bool ServoHerkulex::torqueOff (int tID) {
+bool ServoHerkulex::torqueOff (int tID)
+{
   std::vector<uint8_t> buf = {0x0A, 0x00, 0x03, 0x34, 0x01, 0x00};
   buf[1] = (uint8_t)tID;
   sendData(buf);
@@ -155,7 +189,8 @@ bool ServoHerkulex::torqueOff (int tID) {
   return true;
 }
 
-bool ServoHerkulex::setLED (int tLED, int tID) {
+bool ServoHerkulex::setLED (int tLED, int tID)
+{
   std::vector<uint8_t> buf = {0x0A, 0x00, 0x03, 0x35, 0x01, 0x00};  // Set LED sequence
   buf[1] = (uint8_t)tID;
   buf[5] = (uint8_t)tLED;
@@ -164,13 +199,46 @@ bool ServoHerkulex::setLED (int tLED, int tID) {
   return true;
 }
 
-bool ServoHerkulex::moveAngle0601 (int goal, int tID, int tLED, float playtime) {
-  if (goal > 166.6 || goal < -166.6) {
-    std::cout << "Goal out of recommended range [-166.6, 166.6]." << std::endl;
+bool ServoHerkulex::stopSpeedO201 (int tID, int tLED)
+{
+  // The servo will stop if speed is 0 and the stop flag is 0
+  // or the speed is not 0 and the stop flag is 1.
+  int speed = 0;
+
+  // To make sure the MCU knows the servo is not moving (instead of "moving at speed zero")
+  uint8_t uiStop = 1;
+  uint8_t uiMode = 1;
+  uiMode = uiMode << 1;
+  uint8_t uiLED = (uint8_t)(tLED) << 2;
+  uint8_t setVal = 0x00;
+
+  uint8_t pt = 0x01;
+
+  std::vector<uint8_t> buf = std::vector<uint8_t> (8);
+  buf  = {0x0C, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00};
+  buf[1] = (uint8_t)tID;
+  buf[3] = pt;
+  buf[7] = buf[1];
+
+  buf[5] = speed >> 8;     // high byte
+  buf[4] = speed & 0x00FF; // low byte
+
+  setVal = (uiStop | uiMode | uiLED);
+  buf[6] = setVal;
+
+  sendData(buf);
+
+  return true;
+}
+
+bool ServoHerkulex::moveAngle0601 (int goal, int tID, int tLED, float playtime)
+{
+  if (goal > 159 || goal < -159) {
+    std::cout << "Goal out of recommended range [-159, 159]." << std::endl;
     return false;
   }
 
-  if (playtime > 2844.0 || playtime < 11.2) {
+  if (playtime > 2844.0f || playtime < 11.2f) {
     std::cout << "Playtime out of recommended range [11.2ms, 2844ms]." << std::endl;
     return false;
   }
@@ -184,16 +252,13 @@ bool ServoHerkulex::moveAngle0601 (int goal, int tID, int tLED, float playtime) 
   uint8_t pt = 0x00;
   pt = (uint8_t)(playtime/11.2f);
 
-  uint16_t p = 0x0000;
-  uint16_t temp = (uint16_t)(6.14f*goal);
+  uint16_t p = (uint16_t)(6.14f*goal) + 1024;
 
   std::vector<uint8_t> buf = std::vector<uint8_t> (8);
   buf  = {0x0C, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00};
   buf[1] = (uint8_t)tID;
   buf[3] = pt;
   buf[7] = buf[1];
-
-  p = 1024.0 + temp;
 
   buf[5] = p >> 8;     // high byte
   buf[4] = p & 0x00FF; // low byte
@@ -206,9 +271,10 @@ bool ServoHerkulex::moveAngle0601 (int goal, int tID, int tLED, float playtime) 
   return true;
 }
 
-bool ServoHerkulex::moveAngle0201 (int goal, int tID, int tLED, float playtime) {
-  if (goal > 159.8f || goal < -159.8f) {
-    std::cout << "Goal out of recommended range [-159.8, 159.8]." << std::endl;
+bool ServoHerkulex::moveAngle0201 (int goal, int tID, int tLED, float playtime)
+{
+  if (goal > 159 || goal < -159) {
+    std::cout << "Goal out of recommended range [-159, 159]." << std::endl;
     return false;
   }
 
@@ -226,16 +292,13 @@ bool ServoHerkulex::moveAngle0201 (int goal, int tID, int tLED, float playtime) 
   uint8_t pt = 0x00;
   pt = (uint8_t)(playtime/11.2f);
 
-  uint16_t p = 0x0000;
-  uint16_t temp = (uint16_t)(3.07*goal);
+  uint16_t p = (uint16_t)(3.07*goal) + 512;
 
   std::vector<uint8_t> buf = std::vector<uint8_t> (8);
   buf  = {0x0C, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00};
   buf[1] = (uint8_t)tID;
   buf[3] = pt;
   buf[7] = buf[1];
-
-  p = 512.0 + temp;
 
   buf[5] = p >> 8;     // high byte
   buf[4] = p & 0x00FF; // low byte
@@ -248,7 +311,8 @@ bool ServoHerkulex::moveAngle0201 (int goal, int tID, int tLED, float playtime) 
   return true;
 }
 
-bool ServoHerkulex::moveSpeed0201 (int speed, int tID, int tLED, float playtime) {
+bool ServoHerkulex::moveSpeed0201 (int speed, int tID, int tLED, float playtime)
+{
   if (playtime > 2844.0f || playtime < 11.2f) {
     std::cout << "Playtime out of range [11.2ms, 2844ms]." << std::endl;
     return false;
@@ -290,7 +354,8 @@ bool ServoHerkulex::moveSpeed0201 (int speed, int tID, int tLED, float playtime)
   return true;
 }
 
-bool ServoHerkulex::moveSyncSpeed (std::vector<int> speed, std::vector<int> tID, std::vector<int> tLED, float playtime) {
+bool ServoHerkulex::moveSyncSpeed (std::vector<int> speed, std::vector<int> tID, std::vector<int> tLED, float playtime)
+{
   int size = speed.size();
   int k, id = 0, c = 0, sp = 0;
 
@@ -327,8 +392,6 @@ bool ServoHerkulex::moveSyncSpeed (std::vector<int> speed, std::vector<int> tID,
   uint8_t setVal = 0x00;
   uint8_t uiStop = 0;
   uint8_t uiLED = 0;
-  uint16_t p = 0x0000;
-  uint16_t temp = 0x0000;
   uint8_t uiMode = 1;
   uiMode = uiMode << 1;
 
@@ -355,7 +418,8 @@ bool ServoHerkulex::moveSyncSpeed (std::vector<int> speed, std::vector<int> tID,
   return true;
 }
 
-bool ServoHerkulex::moveSync (std::vector<int> goal, std::vector<int> tID, std::vector<int> tLED, float playtime) {
+bool ServoHerkulex::moveSync (std::vector<int> goal, std::vector<int> tID, std::vector<int> tLED, float playtime)
+{
   int size = goal.size();
   int k, id = 0, c = 0;
 
@@ -411,7 +475,8 @@ bool ServoHerkulex::moveSync (std::vector<int> goal, std::vector<int> tID, std::
   return true;
 }
 
-bool ServoHerkulex::moveAsync (std::vector<int> goal, std::vector<int> tID, std::vector<int> tLED, std::vector<float> playtime) {
+bool ServoHerkulex::moveAsync (std::vector<int> goal, std::vector<int> tID, std::vector<int> tLED, std::vector<float> playtime)
+{
   int size = goal.size();
   int k, id = 0, c = 0;
 
@@ -468,7 +533,7 @@ bool ServoHerkulex::moveAsync (std::vector<int> goal, std::vector<int> tID, std:
   }
 
   int a = 0;
-  for (int j = 0; j < sync_buffer.size(); j++) {
+  for (unsigned int j = 0; j < sync_buffer.size(); j++) {
     a = sync_buffer[j];
     std::cout << a << " ";
   }
@@ -480,7 +545,8 @@ bool ServoHerkulex::moveAsync (std::vector<int> goal, std::vector<int> tID, std:
 
 }
 
-std::vector<std::string> ServoHerkulex::getModels () {
+std::vector<std::string> ServoHerkulex::getModels ()
+{
   int s = model.size();
   std::vector<std::string> models = std::vector<std::string> (s);
 
@@ -491,27 +557,60 @@ std::vector<std::string> ServoHerkulex::getModels () {
   return models;
 }
 
-std::vector<int> ServoHerkulex::getIDs () {
+std::vector<int> ServoHerkulex::getIDs ()
+{
   return ID;
 }
 
 
-float ServoHerkulex::getAngle (int tID) {
-  std::vector<uint8_t> ack  = std::vector<uint8_t> (13);
-  int pos = 0;
+float ServoHerkulex::getAngle0601 (int tID)
+{
+  float pos = (float) getPosition0601(tID);
 
-  std::vector<uint8_t> buf = {0x09, 0x00, 0x04, 0x3A, 0x02};
+	return (pos-1024.0f)*0.163f;
+}
+
+float ServoHerkulex::getAngle0201 (int tID)
+{
+  float pos = (float) getPosition0201(tID);
+
+	return (pos-512.0f)*0.325f;
+}
+
+uint16_t ServoHerkulex::getPosition0201 (int tID)
+{
+  std::vector<uint8_t> ack  = std::vector<uint8_t> (13);
+  uint16_t pos = 0;
+
+  std::vector<uint8_t> buf = {0x09, 0x00, 0x04, 0x3A, 0x02}; // 3A
   buf[1] = (uint8_t)tID;
   sendData(buf, 13);
 
-  ack = manager.getAckPacket();
+  ack = manager.getACKPacket();
 
   pos = ((ack[10]&0x03) << 8) | ack[9];
 
-	return (pos - 512.0)*0.325;
+	return pos;
 }
 
-int ServoHerkulex::getSpeed (int tID) {
+uint16_t ServoHerkulex::getPosition0601 (int tID)
+{
+  std::vector<uint8_t> ack  = std::vector<uint8_t> (13);
+  uint16_t pos = 0;
+
+  std::vector<uint8_t> buf = {0x09, 0x00, 0x04, 0x3A, 0x02}; // 3C
+  buf[1] = (uint8_t)tID;
+  sendData(buf, 13);
+
+  ack = manager.getACKPacket();
+
+  pos = ((ack[10]&0x07) << 8) | ack[9];
+
+	return pos;
+}
+
+int ServoHerkulex::getSpeed (int tID)
+{
   std::vector<uint8_t> ack = std::vector<uint8_t> (13);
   int sp  = 0;
 
@@ -519,14 +618,15 @@ int ServoHerkulex::getSpeed (int tID) {
   buf[1] = (uint8_t)tID;
   sendData(buf, 13);
 
-  ack = manager.getAckPacket();
+  ack = manager.getACKPacket();
 
   sp = ((ack[10]&0xFF) << 8) | ack[9];
 
 	return sp;
 }
 
-int ServoHerkulex::mapModel (std::string mmodel) {
+int ServoHerkulex::mapModel (std::string mmodel)
+{
   if (mmodel == "0101") {
     return H0101;
   }
@@ -545,7 +645,8 @@ int ServoHerkulex::mapModel (std::string mmodel) {
   }
 }
 
-std::string ServoHerkulex::remapModel (int mmodel) {
+std::string ServoHerkulex::remapModel (int mmodel)
+{
   if (mmodel == H0101) {
     return "0101";
   }
@@ -561,7 +662,8 @@ std::string ServoHerkulex::remapModel (int mmodel) {
   else return '\0';
 }
 
-int ServoHerkulex::pingID (int tID) {
+int ServoHerkulex::pingID (int tID)
+{
   int k = getID(tID);
 
   if (k == 12) {
@@ -571,40 +673,47 @@ int ServoHerkulex::pingID (int tID) {
   return -1;
 }
 
-int ServoHerkulex::getID (int gID) {
+int ServoHerkulex::getID (int gID)
+{
   std::vector<uint8_t> buf = {0x09, 0x00, 0x04, 0x00, 0x01};
   buf[1] = (uint8_t)gID;
   return sendData(buf, 12);
 }
 
-int ServoHerkulex::getModel (int gID) {
+int ServoHerkulex::getModel (int gID)
+{
   std::vector<uint8_t> buf = {0x09, 0x00, 0x02, 0x00, 0x01};
   buf[1] = (uint8_t)gID;
   return sendData(buf, 12);
 }
 
-int ServoHerkulex::sendData (std::vector<uint8_t>& packet) {
+int ServoHerkulex::sendData (std::vector<uint8_t>& packet)
+{
   return manager.sendTx(packet.size()+4, packet, packet[1], verbose_);
 }
 
-int ServoHerkulex::sendData (std::vector<uint8_t>& packet, int ack_length) {
+int ServoHerkulex::sendData (std::vector<uint8_t>& packet, int ack_length)
+{
   return manager.sendTxRx(packet.size()+4, packet, ack_length, packet[1], verbose_);
 }
 
-void ServoHerkulex::addSync(uint8_t goalLSB, uint8_t goalMSB, uint8_t tSET, uint8_t tID) {
+void ServoHerkulex::addSync(uint8_t goalLSB, uint8_t goalMSB, uint8_t tSET, uint8_t tID)
+{
   //sync_buffer[c++] = goalLSB;
   //sync_buffer[c++] = goalLSB;
   //sync_buffer[c++] = goalLSB;
   //sync_buffer[c++] = goalLSB;
 }
 
-bool ServoHerkulex::resizeBuffer (int length) {
+bool ServoHerkulex::resizeBuffer (int length)
+{
   manager.resizeData(length);
 
   return true;
 }
 
-bool ServoHerkulex::actionAll (float playtime) {
+bool ServoHerkulex::actionAll (float playtime)
+{
   uint8_t pt = 0x00;
   pt = (uint8_t)(playtime/11.2f);
   int s = sync_buffer.size();
@@ -625,7 +734,8 @@ bool ServoHerkulex::actionAll (float playtime) {
   return true;
 }
 
-bool ServoHerkulex::actionAll () {
+bool ServoHerkulex::actionAll ()
+{
   int s = sync_buffer.size();
 
   std::vector<uint8_t> buf = std::vector<uint8_t> (s+3);
@@ -643,7 +753,8 @@ bool ServoHerkulex::actionAll () {
   return true;
 }
 
-uint8_t ServoHerkulex::checkSum1 (std::vector<uint8_t> bytes) {
+uint8_t ServoHerkulex::checkSum1 (std::vector<uint8_t> bytes)
+{
   //if (MIN_PACKET_SIZE < bytes.size() < MAX_PACKET_SIZE) {
   //  return PACKET_ERR_CS;
   //}
@@ -659,7 +770,8 @@ uint8_t ServoHerkulex::checkSum1 (std::vector<uint8_t> bytes) {
   return cs1;
 }
 
-uint8_t ServoHerkulex::checkSum2 (uint8_t cs1) {
+uint8_t ServoHerkulex::checkSum2 (uint8_t cs1)
+{
   uint8_t cs2 = 0;
 
   cs2 = ~(cs1);
