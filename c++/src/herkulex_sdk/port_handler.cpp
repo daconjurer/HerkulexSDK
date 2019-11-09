@@ -1,47 +1,3 @@
-<<<<<<< HEAD
-/*********************************************************************
- * Software License Agreement (BSD License)
- *
- *  Copyright (c) 2019, Robótica de la Mixteca
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above
- *     copyright notice, this list of conditions and the following
- *     disclaimer in the documentation and/or other materials provided
- *     with the distribution.
- *   * Neither the name of Universidad Tecnológica de la Mixteca nor
- *     the names of its contributors may be used to endorse or promote
- *     products derived from this software without specific prior
- *     written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- *  POSSIBILITY OF SUCH DAMAGE.
- *********************************************************************/
-
-////////////////////////////////////////////////////////
-/// @file Serial read and write port handler. It uses
-/// a generic FTDI USB-to-TTL converter and has been
-/// tested on Linux.
-///
-/// @author Victor Esteban Sandoval-Luna
-////////////////////////////////////////////////////////
-=======
 /*******************************************************************************
 * Copyright 2018 Robótica de la Mixteca
 *
@@ -59,68 +15,11 @@
 *******************************************************************************/
 
 /* Author: Victor Esteban Sandoval-Luna */
->>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
 
 #include "../../include/herkulex_sdk/port_handler.h"
 
 using namespace herkulex;
 
-<<<<<<< HEAD
-
-// Constructors
-PortHandler::PortHandler () 
-{
-	port_name_ = (char*)"/dev/ttyUSB0";
-	socket_fd_ = -1;
-	setBaudRate(DEFAULT_BAUDRATE);
-}
-
-PortHandler::PortHandler (char* const portname, const int& baudrate) 
-{
-	port_name_= portname;
-	socket_fd_ = -1;
-	setBaudRate(baudrate);
-}
-
-bool PortHandler::openPort ()
-{
-  socket_fd_ = open (port_name_, O_RDWR | O_NOCTTY | O_SYNC);
-  
-  if (socket_fd_ < 0) {
-    std::cout << "Error opening " << port_name_ << ": "<< std::strerror(errno) <<  std::endl;
-    return false;
-  }
-  
-  setInterfaceAttribs(socket_fd_, baudrate_, 0);
-  tcflush(socket_fd_, TCIFLUSH);
-  
-  return true;
-}
-
-void PortHandler::closePort ()
-{
-  if(socket_fd_ != -1) {close(socket_fd_);}
-  socket_fd_ = -1;
-}
-
-void PortHandler::clearPort ()
-{
-  tcflush(socket_fd_, TCIFLUSH);
-}
-
-void PortHandler::setPortName (char* const portname)
-{
-  port_name_ = (char*)portname;
-}
-
-char* PortHandler::getPortName () {return port_name_;}
-
-int PortHandler::setBaudRate (const int& baudrate)
-{
-  // Considering both Hovis HerkuleX servos limits and TTL hardware limits (up to 500000 bps)
-  int br = -1;
-  
-=======
 // Constructors
 PortHandler::PortHandler () {
   port_name = (char*)"/dev/ttyUSB0";
@@ -171,7 +70,6 @@ int PortHandler::setBaudRate (const int baudrate) {
   // Considering both Hovis HerkuleX servos limits and TTL hardware limits (up to 500000 bps)
   int br = -1;
 
->>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
   switch (baudrate) {
     case 9600:
       baudrate_ = B9600;
@@ -198,33 +96,11 @@ int PortHandler::setBaudRate (const int baudrate) {
       baudrate_ = B115200;
       br = 0;
   }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
   if (br == -1) {
     std::cout << "Error setting baudrate: Invalid baudrate." << std::endl;
     return br;
   }
-<<<<<<< HEAD
-  
-  return baudrate;
-}
-
-int PortHandler::readPort (uint8_t* const packet, const int& length)
-{
-  return read(socket_fd_, packet, length);
-}
-
-int PortHandler::writePort (uint8_t* const packet, const int& length)
-{
-  return write(socket_fd_, packet, length);
-}
-
-int PortHandler::setInterfaceAttribs (const int& fd, const int& baudrate, const int& parity)
-{
-=======
 
   return baudrate;
 }
@@ -249,7 +125,6 @@ int PortHandler::writePort (uint8_t *packet, int length) {
 }
 
 int PortHandler::setInterfaceAttribs (int fd, int baudrate, int parity) {
->>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
   struct termios tty;
   memset(&tty, 0, sizeof tty);
 
@@ -293,8 +168,6 @@ int PortHandler::setInterfaceAttribs (int fd, int baudrate, int parity) {
   return 0;
 }
 
-<<<<<<< HEAD
-=======
 void PortHandler::setBlocking (int fd, int block) {
   struct termios tty;
   memset(&tty, 0, sizeof tty);
@@ -331,4 +204,3 @@ int PortHandler::remapBaudRate (const int baudrate) {
       return -1;
   }
 }
->>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
