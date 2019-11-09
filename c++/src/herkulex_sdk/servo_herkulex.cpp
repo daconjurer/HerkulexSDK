@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
@@ -40,6 +41,28 @@
 ///
 /// @author Victor Esteban Sandoval-Luna
 ////////////////////////////////////////////////////////
+=======
+/*******************************************************************************
+* Copyright 2018 Robótica de la Mixteca
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*******************************************************************************/
+
+/* Author: Victor Esteban Sandoval-Luna */
+
+#include <stdexcept>
+using std::runtime_error;
+>>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
 
 #include "../../include/herkulex_sdk/servo_herkulex.h"
 
@@ -103,7 +126,11 @@ bool ServoHerkulex::ping ()
     k = pingID(j);
 
     if (k == 12) {
+<<<<<<< HEAD
       packet = manager.getACKPacket();
+=======
+      packet = manager.getAckPacket();
+>>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
       id = packet[9];
       std::cout << "Herkulex [" << id << "] UP" << std::endl;
       n = n+1;
@@ -149,7 +176,11 @@ std::vector<uint8_t> ServoHerkulex::getStatus (int tID)
   std::vector<uint8_t> stat;
   buf[1] = (uint8_t)tID;
   sendData(buf, 9);
+<<<<<<< HEAD
   stat = manager.getACKPacket();
+=======
+  stat = manager.getAckPacket();
+>>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
 
   if (verbose_) {
     for (unsigned int j = 0; j < stat.size(); j++) {
@@ -586,7 +617,11 @@ uint16_t ServoHerkulex::getPosition0201 (int tID)
   buf[1] = (uint8_t)tID;
   sendData(buf, 13);
 
+<<<<<<< HEAD
   ack = manager.getACKPacket();
+=======
+  ack = manager.getAckPacket();
+>>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
 
   pos = ((ack[10]&0x03) << 8) | ack[9];
 
@@ -602,7 +637,11 @@ uint16_t ServoHerkulex::getPosition0601 (int tID)
   buf[1] = (uint8_t)tID;
   sendData(buf, 13);
 
+<<<<<<< HEAD
   ack = manager.getACKPacket();
+=======
+  ack = manager.getAckPacket();
+>>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
 
   pos = ((ack[10]&0x07) << 8) | ack[9];
 
@@ -618,7 +657,11 @@ int ServoHerkulex::getSpeed (int tID)
   buf[1] = (uint8_t)tID;
   sendData(buf, 13);
 
+<<<<<<< HEAD
   ack = manager.getACKPacket();
+=======
+  ack = manager.getAckPacket();
+>>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
 
   sp = ((ack[10]&0xFF) << 8) | ack[9];
 
