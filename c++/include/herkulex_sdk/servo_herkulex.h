@@ -98,6 +98,8 @@ class ServoHerkulex
     bool actionAll (float playtime);
     bool actionAll ();
 
+    // uint16_t getPosition (int tID);
+
     uint8_t checkSum1 (std::vector<uint8_t> bytes);
     uint8_t checkSum2 (uint8_t cs1);
 
@@ -120,6 +122,8 @@ class ServoHerkulex
     bool torqueOff (int tID);
     bool setLED (int tLED, int tID);
 
+    bool stopSpeedO201 (int tID, int tLED);
+
     bool moveAngle0601 (int goal, int tID, int tLED, float playtime);
     bool moveAngle0201 (int goal, int tID, int tLED, float playtime);
 
@@ -133,8 +137,12 @@ class ServoHerkulex
     // Hovis HerkuleX servos class
     std::vector<std::string> getModels ();
     std::vector<int> getIDs ();
-    float getAngle (int tID);
+    float getAngle0601 (int tID);
+    float getAngle0201 (int tID);
     int getSpeed (int tID);
+
+    uint16_t getPosition0201 (int tID);
+    uint16_t getPosition0601 (int tID);
 
 };
 
