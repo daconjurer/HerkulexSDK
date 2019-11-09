@@ -94,7 +94,7 @@ int PacketManager::sendTxSync (int length, std::vector<uint8_t> buf, int& verb) 
   int a = 0;
   std::cout << "sendsync:" << std::endl;
 
-  for (int i = 0; i < data.size(); i++) {
+  for (unsigned int i = 0; i < data.size(); i++) {
     a = data[i];
     std::cout << a << std::endl;
   }
