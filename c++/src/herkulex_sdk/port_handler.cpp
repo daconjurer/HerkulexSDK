@@ -45,55 +45,60 @@
 
 using namespace herkulex;
 
+
 // Constructors
-PortHandler::PortHandler () {
-  port_name_ = (char*)"/dev/ttyUSB0";
-  socket_fd_ = -1;
-  setBaudRate(115200);
+PortHandler::PortHandler () 
+{
+	port_name_ = (char*)"/dev/ttyUSB0";
+	socket_fd_ = -1;
+	setBaudRate(DEFAULT_BAUDRATE);
 }
 
-PortHandler::PortHandler (const char *portname) {
-  port_name_ = (char*)portname;
-  socket_fd_ = -1;
-  setBaudRate(115200);
+PortHandler::PortHandler (char* const portname, const int& baudrate) 
+{
+	port_name_= portname;
+	socket_fd_ = -1;
+	setBaudRate(baudrate);
 }
 
-bool PortHandler::openPort () {
+bool PortHandler::openPort ()
+{
   socket_fd_ = open (port_name_, O_RDWR | O_NOCTTY | O_SYNC);
-
+  
   if (socket_fd_ < 0) {
     std::cout << "Error opening " << port_name_ << ": "<< std::strerror(errno) <<  std::endl;
     return false;
   }
-
+  
   setInterfaceAttribs(socket_fd_, baudrate_, 0);
   tcflush(socket_fd_, TCIFLUSH);
-
+  
   return true;
 }
 
-void PortHandler::closePort () {
-  if(socket_fd_ != -1)
-    close(socket_fd_);
+void PortHandler::closePort ()
+{
+  if(socket_fd_ != -1) {close(socket_fd_);}
   socket_fd_ = -1;
 }
 
-void PortHandler::clearPort () {
+void PortHandler::clearPort ()
+{
   tcflush(socket_fd_, TCIFLUSH);
 }
 
-void PortHandler::setPortName (const char* portname) {
+void PortHandler::setPortName (char* const portname)
+{
   port_name_ = (char*)portname;
 }
 
-char* PortHandler::getPortName () {
-  return port_name_;
-}
+char* PortHandler::getPortName () {return port_name_;}
 
-int PortHandler::setBaudRate (const int baudrate) {
+int PortHandler::setBaudRate (const int& baudrate)
+{
   // Considering both Hovis HerkuleX servos limits and TTL hardware limits (up to 500000 bps)
   int br = -1;
-
+  
   switch (baudrate) {
     case 9600:
       baudrate_ = B9600;
@@ -120,35 +125,27 @@ int PortHandler::setBaudRate (const int baudrate) {
       baudrate_ = B115200;
       br = 0;
   }
-
+  
   if (br == -1) {
     std::cout << "Error setting baudrate: Invalid baudrate." << std::endl;
     return br;
   }
-
+  
   return baudrate;
 }
 
-int PortHandler::getBaudRate ()
+int PortHandler::readPort (uint8_t* const packet, const int& length)
 {
-  return remapBaudRate(baudrate_);
-}
-
-int PortHandler::getBytesAvailable () {
-  int bytes_available;
-  ioctl(socket_fd_, FIONREAD, &bytes_available);
-  return bytes_available;
-}
-
-int PortHandler::readPort (uint8_t *packet, int length) {
   return read(socket_fd_, packet, length);
 }
 
-int PortHandler::writePort (uint8_t *packet, int length) {
+int PortHandler::writePort (uint8_t* const packet, const int& length)
+{
   return write(socket_fd_, packet, length);
 }
 
-int PortHandler::setInterfaceAttribs (int fd, int baudrate, int parity) {
+int PortHandler::setInterfaceAttribs (const int& fd, const int& baudrate, const int& parity)
+{
   struct termios tty;
   memset(&tty, 0, sizeof tty);
 
@@ -192,23 +189,3 @@ int PortHandler::setInterfaceAttribs (int fd, int baudrate, int parity) {
   return 0;
 }
 
-int PortHandler::remapBaudRate (const int baudrate) {
-  switch (baudrate) {
-    case B9600:
-      return 9600;
-    case B19200:
-      return 19200;
-    case B38400:
-      return 38400;
-    case B57600:
-      return 57600;
-    case B115200:
-      return 115200;
-    case B230400:
-      return 230400;
-    case B460800:
-      return 460800;
-    default:
-      return -1;
-  }
-}
