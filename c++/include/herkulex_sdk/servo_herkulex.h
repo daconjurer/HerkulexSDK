@@ -82,7 +82,7 @@ class ServoHerkulex
     std::vector<int> model = std::vector<int> (1);  // default
     std::vector<uint8_t> sync_buffer = std::vector<uint8_t> (1);
     PacketManager manager;
-    int verbose_;
+    int verbosity;
 
     // methods
     int mapModel (std::string mmodel);
@@ -93,23 +93,15 @@ class ServoHerkulex
     int sendData (std::vector<uint8_t>& packet);
     int sendData (std::vector<uint8_t>& packet, int ack_length);
 
-    void addSync (uint8_t goalLSB, uint8_t goalMSB, uint8_t tSET, uint8_t tID);
     bool resizeBuffer (int length);
     bool actionAll (float playtime);
     bool actionAll ();
 
-    // uint16_t getPosition (int tID);
-
-    uint8_t checkSum1 (std::vector<uint8_t> bytes);
-    uint8_t checkSum2 (uint8_t cs1);
-
   public:
     // Constructors
     ServoHerkulex (int verb);
-    ServoHerkulex (int tID, const char *smodel, int verb);
+    ServoHerkulex (int tID, char* smodel, int verb);
     ServoHerkulex (std::vector<int> sIDs, std::vector<std::string> smodels, int verb);
-
-    bool setPortLabel (const char* label);
 
     // Hovis HerkuleX servos register map
     bool reboot (int sID);

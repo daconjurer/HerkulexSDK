@@ -44,32 +44,32 @@
 
 using namespace herkulex;
 
-// Constructors
+// Default yet never used in the application
 PortHandler::PortHandler ()
 {
-  port_name = (char*)"/dev/ttyUSB0";
-  socket_fd = -1;
+  port_name_ = (char*)"/dev/ttyUSB0";
+  socket_fd_ = -1;
   setBaudRate(DEFAULT_BAUDRATE);
 }
 
 PortHandler::PortHandler (char* const portname, const int& baudrate)
 {
-  port_name = portname;
-  socket_fd = -1;
+  port_name_ = portname;
+  socket_fd_ = -1;
   setBaudRate(baudrate);
 }
 
 bool PortHandler::openPort ()
 {
-  socket_fd = open (port_name, O_RDWR | O_NOCTTY | O_SYNC);
+  socket_fd_ = open (port_name_, O_RDWR | O_NOCTTY | O_SYNC);
 
-  if (socket_fd < 0) {
-    std::cout << "Error opening " << port_name << ": "<< std::strerror(errno) <<  std::endl;
+  if (socket_fd_ < 0) {
+    std::cout << "Error opening " << port_name_ << ": "<< std::strerror(errno) <<  std::endl;
     return false;
   }
 
-  setInterfaceAttribs(socket_fd, baudrate_, 0);
-  tcflush(socket_fd, TCIFLUSH);
+  setInterfaceAttribs(socket_fd_, baudrate_, 0);
+  tcflush(socket_fd_, TCIFLUSH);
 
   return true;
 }
@@ -82,18 +82,15 @@ void PortHandler::closePort ()
 
 void PortHandler::clearPort ()
 {
-  tcflush(socket_fd, TCIFLUSH);
+  tcflush(socket_fd_, TCIFLUSH);
 }
 
 void PortHandler::setPortName (char* const portname)
 {
-  port_name = (char*)portname;
+  port_name_ = (char*)portname;
 }
 
-char* PortHandler::getPortName ()
-{
-  return port_name_;
-}
+char* PortHandler::getPortName () const {return port_name_;}
 
 int PortHandler::setBaudRate (const int& baudrate)
 {
@@ -137,18 +134,18 @@ int PortHandler::setBaudRate (const int& baudrate)
 int PortHandler::getBytesAvailable ()
 {
   int bytes_available;
-  ioctl(socket_fd, FIONREAD, &bytes_available);
+  ioctl(socket_fd_, FIONREAD, &bytes_available);
   return bytes_available;
 }
 
 int PortHandler::readPort (uint8_t* const packet, const int& length)
 {
-  return read(socket_fd, packet, length);
+  return read(socket_fd_, packet, length);
 }
 
 int PortHandler::writePort (uint8_t* const packet, const int& length)
 {
-  return write(socket_fd, packet, length);
+  return write(socket_fd_, packet, length);
 }
 
 int PortHandler::setInterfaceAttribs (const int& fd, const int& baudrate, const int& parity)
