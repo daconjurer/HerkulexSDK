@@ -61,6 +61,20 @@ PacketManager::PacketManager ()
   data[0] = 0x00;
 }
 
+PacketManager::PacketManager (const int& verb)
+{
+  verbosity = (verb == 0 || verb == 1) ? verb : 0;
+
+  header[0] = 0xFF;
+  header[1] = 0xFF;
+  pSize = 0;
+  CMD = 0;
+  pID = 0;
+  cs1 = 0;
+  cs2 = 0;
+  data[0] = 0x00;
+}
+
 PacketManager::PacketManager (char* const port_name, const int& baudrate, const int& verb) : port(port_name,baudrate)
 {
   verbosity = (verb == 0 || verb == 1) ? verb : 0;

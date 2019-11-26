@@ -114,6 +114,7 @@ class PacketManager
   public:
     // Constructors
     PacketManager ();
+    PacketManager (const int& verb);
     PacketManager (char* port_name, const int& baudrate, const int& verb);
     virtual ~PacketManager () { }
 

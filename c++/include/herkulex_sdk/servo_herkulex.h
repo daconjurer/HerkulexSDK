@@ -1,23 +1,43 @@
-/*******************************************************************************
-* Copyright 2018 Robótica de la Mixteca
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*******************************************************************************/
-
-////////////////////////////////////////////////////////
-/// @file Hovis HerkuleX servo library
+/*********************************************************************
+ * Software License Agreement (BSD License)
+ *
+ *  Copyright (c) 2019, Robótica de la Mixteca
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above
+ *     copyright notice, this list of conditions and the following
+ *     disclaimer in the documentation and/or other materials provided
+ *     with the distribution.
+ *   * Neither the name of Universidad Tecnológica de la Mixteca nor
+ *     the names of its contributors may be used to endorse or promote
+ *     products derived from this software without specific prior
+ *     written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ *********************************************************************/
+ 
+/////////////////////////////////////////////////////////////////////////////////////////
+/// @file ServoHerkulex class definition.
 /// @author Victor Esteban Sandoval-Luna
-////////////////////////////////////////////////////////
+///
+/////////////////////////////////////////////////////////////////////////////////////////
 
 #ifndef HERKULEX_SDK_SERVOHERKULEX_H_
 #define HERKULEX_SDK_SERVOHERKULEX_H_
@@ -70,23 +90,29 @@
 #define LED_PURPLE          0x06
 #define LED_WHITE           0x07
 
-
 namespace herkulex
 {
 
 class ServoHerkulex
 {
   private:
-    // attributes
+    // Attributes
+    
+    // PacketManager member for building up the HerkuleX packets
+    PacketManager manager;
+    // Verbosity
+    int verbosity;
+    
+    // For connected servos IDs and models traceability whithin applications
     std::vector<int> ID = std::vector<int> (1);     // default
     std::vector<int> model = std::vector<int> (1);  // default
+    
+    // Buffer for sync operations (see datasheet)
     std::vector<uint8_t> sync_buffer = std::vector<uint8_t> (1);
-    PacketManager manager;
-    int verbosity;
 
-    // methods
-    int mapModel (std::string mmodel);
-    std::string remapModel (int mmodel);
+    // Methods
+    
+    // 
     int pingID(int tID);
     int getID (int gID);
     int getModel (int gID);
@@ -97,13 +123,18 @@ class ServoHerkulex
     bool actionAll (float playtime);
     bool actionAll ();
 
+    // These methods will allow model tracing *****
+    int mapModel (std::string mmodel);
+    std::string remapModel (int mmodel);
+
   public:
     // Constructors
-    ServoHerkulex (int verb);
-    ServoHerkulex (int tID, char* smodel, int verb);
-    ServoHerkulex (std::vector<int> sIDs, std::vector<std::string> smodels, int verb);
+    ServoHerkulex (const int& verb);
+    ServoHerkulex (char* port_name, const int& baudrate, const int& verb);
+    ServoHerkulex (char* port_name, const int& baudrate, const int& tID, char* smodel, const int& verb);
+    ServoHerkulex (char* port_name, const int& baudrate, std::vector<int> sIDs, std::vector<std::string> smodels, const int& verb);
 
-    // Hovis HerkuleX servos register map
+    //     // Hovis HerkuleX servos class
     bool reboot (int sID);
     bool ping ();
     bool setID (int cID, int nID);
@@ -126,9 +157,8 @@ class ServoHerkulex
     bool moveSync (std::vector<int> goal, std::vector<int> tID, std::vector<int> tLED, float playtime);
     bool moveAsync (std::vector<int> goal, std::vector<int> tID, std::vector<int> tLED, std::vector<float> playtime);
 
-    // Hovis HerkuleX servos class
     std::vector<std::string> getModels ();
-    std::vector<int> getIDs ();
+    std::vector<int> getIDs () const;
     float getAngle0601 (int tID);
     float getAngle0201 (int tID);
     int getSpeed (int tID);

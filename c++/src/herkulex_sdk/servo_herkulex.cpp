@@ -34,13 +34,15 @@
  *********************************************************************/
  
 /////////////////////////////////////////////////////////////////////////////////////////
-/// @file Servo herkulex
-/// @author Victor Esteban Sandoval-Luna
+/// @file ServoHerkulex class implementation. This class attempts to be user interface
+/// for controlling the Herkulex servos.
 ///
+/// @author Victor Esteban Sandoval-Luna
 /////////////////////////////////////////////////////////////////////////////////////////
 
-#include <stdexcept>
-using std::runtime_error;
+/* TODO */
+// Check functionality of the constructor that takes IDs and models vectors as arguments (this is intended for traceability)
+// Complete Models and IDs retrieving. Refer to ***** here and in the Header file
 
 #include "../../include/herkulex_sdk/servo_herkulex.h"
 
@@ -52,21 +54,28 @@ using std::runtime_error;
 using namespace herkulex;
 
 // Default yet never used in the application
-ServoHerkulex::ServoHerkulex (int verb)
+ServoHerkulex::ServoHerkulex (const int& verb) : manager(verb)
 {
   ID[0] = 0;
   model[0] = H0201;
   verbosity = verb;
 }
 
-ServoHerkulex::ServoHerkulex (int sID, char* const smodel, int verb)
+ServoHerkulex::ServoHerkulex (char* port_name, const int& baudrate, const int& verb) : manager(port_name,baudrate,verb)
+{
+  ID[0] = 0;
+  model[0] = H0201;
+  verbosity = verb;
+}
+
+ServoHerkulex::ServoHerkulex (char* port_name, const int& baudrate, const int& sID, char* const smodel, const int& verb) : manager(port_name,baudrate,verb)
 {
   ID[0] = sID;
   model[0] = mapModel(smodel);
   verbosity = verb;
 }
 
-ServoHerkulex::ServoHerkulex (std::vector<int> sIDs, std::vector<std::string> smodels, int verb)
+ServoHerkulex::ServoHerkulex (char* port_name, const int& baudrate, std::vector<int> sIDs, std::vector<std::string> smodels, const int& verb) : manager(port_name,baudrate,verb)
 {
   int size = sIDs.size();
 
@@ -118,7 +127,7 @@ bool ServoHerkulex::ping ()
 
 bool ServoHerkulex::setID (int tID, int nID)
 {
-  std::vector<uint8_t> buf = {0x0A, 0x00, 0x03, 0x35, 0x01, 0x01};  // LED Green
+  std::vector<uint8_t> buf = {0x0A, 0x00, HX_RAMWRITE, 0x35, 0x01, 0x01};  // LED Green
   buf[1] = (uint8_t)tID;
   sendData(buf);
 
@@ -127,12 +136,13 @@ bool ServoHerkulex::setID (int tID, int nID)
 
 bool ServoHerkulex::clearError (int tID)
 {
-  std::vector<uint8_t> buf = {0x0B, 0x00, 0x03, 0x30, 0x02, 0x00, 0x00};  // Clear Error
+  std::vector<uint8_t> buf = {0x0B, 0x00, HX_RAMWRITE, 0x30, 0x02, 0x00, 0x00};  // Clear Error
   buf[1] = (uint8_t)tID;
   sendData(buf);
 
+  // Turn off LED
   buf.resize(6);
-  buf = {0x0A, 0x00, 0x03, 0x35, 0x01, 0x00};
+  buf = {0x0A, 0x00, HX_RAMWRITE, 0x35, 0x01, 0x00};
   buf[1] = (uint8_t)tID;
   sendData(buf);
 
@@ -152,7 +162,7 @@ std::vector<uint8_t> ServoHerkulex::getStatus (int tID)
 
 bool ServoHerkulex::setACK (int ACK)
 {
-  std::vector<uint8_t> buf = {0x0A, 0xFE, 0x03, 0x34, 0x01, 0x01};
+  std::vector<uint8_t> buf = {0x0A, 0xFE, HX_RAMWRITE, 0x34, 0x01, 0x01};
   // 0 = no reply, 1 = reply to READ CMDs only, 2 = always reply
   buf[5] = (uint8_t)ACK;
   sendData(buf);
@@ -162,7 +172,7 @@ bool ServoHerkulex::setACK (int ACK)
 
 bool ServoHerkulex::torqueOn (int tID)
 {
-  std::vector<uint8_t> buf = {0x0A, 0x00, 0x03, 0x34, 0x01, 0x60};
+  std::vector<uint8_t> buf = {0x0A, 0x00, HX_RAMWRITE, 0x34, 0x01, 0x60};
   buf[1] = (uint8_t)tID;
   sendData(buf);
 
@@ -171,7 +181,7 @@ bool ServoHerkulex::torqueOn (int tID)
 
 bool ServoHerkulex::torqueOff (int tID)
 {
-  std::vector<uint8_t> buf = {0x0A, 0x00, 0x03, 0x34, 0x01, 0x00};
+  std::vector<uint8_t> buf = {0x0A, 0x00, HX_RAMWRITE, 0x34, 0x01, 0x00};
   buf[1] = (uint8_t)tID;
   sendData(buf);
 
@@ -180,7 +190,7 @@ bool ServoHerkulex::torqueOff (int tID)
 
 bool ServoHerkulex::setLED (int tLED, int tID)
 {
-  std::vector<uint8_t> buf = {0x0A, 0x00, 0x03, 0x35, 0x01, 0x00};  // Set LED sequence
+  std::vector<uint8_t> buf = {0x0A, 0x00, HX_RAMWRITE, 0x35, 0x01, 0x00};  // Set LED sequence
   buf[1] = (uint8_t)tID;
   buf[5] = (uint8_t)tLED;
   sendData(buf);
@@ -204,7 +214,7 @@ bool ServoHerkulex::stopSpeedO201 (int tID, int tLED)
   uint8_t pt = 0x01;
 
   std::vector<uint8_t> buf = std::vector<uint8_t> (8);
-  buf  = {0x0C, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00};
+  buf  = {0x0C, 0x00, HX_SJOG, 0x00, 0x00, 0x00, 0x00, 0x00};
   buf[1] = (uint8_t)tID;
   buf[3] = pt;
   buf[7] = buf[1];
@@ -244,7 +254,7 @@ bool ServoHerkulex::moveAngle0601 (int goal, int tID, int tLED, float playtime)
   uint16_t p = (uint16_t)(6.14f*goal) + 1024;
 
   std::vector<uint8_t> buf = std::vector<uint8_t> (8);
-  buf  = {0x0C, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00};
+  buf  = {0x0C, 0x00, HX_SJOG, 0x00, 0x00, 0x00, 0x00, 0x00};
   buf[1] = (uint8_t)tID;
   buf[3] = pt;
   buf[7] = buf[1];
@@ -284,7 +294,7 @@ bool ServoHerkulex::moveAngle0201 (int goal, int tID, int tLED, float playtime)
   uint16_t p = (uint16_t)(3.07*goal) + 512;
 
   std::vector<uint8_t> buf = std::vector<uint8_t> (8);
-  buf  = {0x0C, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00};
+  buf  = {0x0C, 0x00, HX_SJOG, 0x00, 0x00, 0x00, 0x00, 0x00};
   buf[1] = (uint8_t)tID;
   buf[3] = pt;
   buf[7] = buf[1];
@@ -327,7 +337,7 @@ bool ServoHerkulex::moveSpeed0201 (int speed, int tID, int tLED, float playtime)
   pt = (uint8_t)(playtime/11.2f);
 
   std::vector<uint8_t> buf = std::vector<uint8_t> (8);
-  buf  = {0x0C, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00};
+  buf  = {0x0C, 0x00, HX_SJOG, 0x00, 0x00, 0x00, 0x00, 0x00};
   buf[1] = (uint8_t)tID;
   buf[3] = pt;
   buf[7] = buf[1];
@@ -546,10 +556,7 @@ std::vector<std::string> ServoHerkulex::getModels ()
   return models;
 }
 
-std::vector<int> ServoHerkulex::getIDs ()
-{
-  return ID;
-}
+std::vector<int> ServoHerkulex::getIDs () const {return ID;}
 
 
 float ServoHerkulex::getAngle0601 (int tID)
@@ -571,7 +578,7 @@ uint16_t ServoHerkulex::getPosition0201 (int tID)
   std::vector<uint8_t> ack  = std::vector<uint8_t> (13);
   uint16_t pos = 0;
 
-  std::vector<uint8_t> buf = {0x09, 0x00, 0x04, 0x3A, 0x02}; // 3A
+  std::vector<uint8_t> buf = {0x09, 0x00, HX_RAMREAD, 0x3A, 0x02}; // 3A
   buf[1] = (uint8_t)tID;
   sendData(buf, 13);
 
@@ -587,7 +594,7 @@ uint16_t ServoHerkulex::getPosition0601 (int tID)
   std::vector<uint8_t> ack  = std::vector<uint8_t> (13);
   uint16_t pos = 0;
 
-  std::vector<uint8_t> buf = {0x09, 0x00, 0x04, 0x3A, 0x02}; // 3C
+  std::vector<uint8_t> buf = {0x09, 0x00, HX_RAMREAD, 0x3A, 0x02}; // 3C
   buf[1] = (uint8_t)tID;
   sendData(buf, 13);
 
@@ -603,7 +610,7 @@ int ServoHerkulex::getSpeed (int tID)
   std::vector<uint8_t> ack = std::vector<uint8_t> (13);
   int sp  = 0;
 
-  std::vector<uint8_t> buf = {0x09, 0x00, 0x04, 0x40, 0x02};
+  std::vector<uint8_t> buf = {0x09, 0x00, HX_RAMREAD, 0x40, 0x02};
   buf[1] = (uint8_t)tID;
   sendData(buf, 13);
 
@@ -614,6 +621,7 @@ int ServoHerkulex::getSpeed (int tID)
 	return sp;
 }
 
+/*****/
 int ServoHerkulex::mapModel (std::string mmodel)
 {
   if (mmodel == "0101") {
@@ -634,6 +642,7 @@ int ServoHerkulex::mapModel (std::string mmodel)
   }
 }
 
+/*****/
 std::string ServoHerkulex::remapModel (int mmodel)
 {
   if (mmodel == H0101) {
@@ -655,16 +664,14 @@ int ServoHerkulex::pingID (int tID)
 {
   int k = getID(tID);
 
-  if (k == 12) {
-    return k;
-  }
+  if (k == 12) {return k;}
 
   return -1;
 }
 
 int ServoHerkulex::getID (int gID)
 {
-  std::vector<uint8_t> buf = {0x09, 0x00, 0x04, 0x00, 0x01};
+  std::vector<uint8_t> buf = {0x09, 0x00, HX_RAMREAD, 0x00, 0x01};
   buf[1] = (uint8_t)gID;
   return sendData(buf, 12);
 }
@@ -695,7 +702,7 @@ bool ServoHerkulex::actionAll (float playtime)
   std::vector<uint8_t> buf = std::vector<uint8_t> (s+4);
   buf[0] = s+8;
   buf[1] = (s == 4) ? sync_buffer[3] : 0xFE;
-  buf[2] = 0x06;
+  buf[2] = HX_SJOG;
   buf[3] = pt;
 
   // Shifting data
@@ -715,7 +722,7 @@ bool ServoHerkulex::actionAll ()
   std::vector<uint8_t> buf = std::vector<uint8_t> (s+3);
   buf[0] = s+7;
   buf[1] = (s == 5) ? sync_buffer[3] : 0xFE;
-  buf[2] = 0x05;
+  buf[2] = HX_IJOG;
 
   // Shifting data
   for (int i = 0; i < s; i++) {
