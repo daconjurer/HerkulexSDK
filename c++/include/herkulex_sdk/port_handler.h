@@ -34,7 +34,7 @@
  *********************************************************************/
  
 /////////////////////////////////////////////////////////////////////////////////////////
-/// @file PortHandler class definition of the MSV-01 rescue robot.
+/// @file PortHandler class definition.
 /// @author Victor Esteban Sandoval-Luna
 ///
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -90,7 +90,7 @@ class PortHandler
     void setPortName(char* port_name);
 
     // Gets the name of the port
-    char* getPortName ();
+    char* getPortName () const;
 
     // Sets the baudrate of the port
     int setBaudRate(const int& baudrate);

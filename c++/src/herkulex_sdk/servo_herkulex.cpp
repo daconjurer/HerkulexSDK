@@ -51,19 +51,19 @@ using std::runtime_error;
 
 using namespace herkulex;
 
+// Default yet never used in the application
 ServoHerkulex::ServoHerkulex (int verb)
 {
-  // default yet never used in the application
   ID[0] = 0;
   model[0] = H0201;
-  verbose_ = verb;
+  verbosity = verb;
 }
 
-ServoHerkulex::ServoHerkulex (int sID, const char *smodel, int verb)
+ServoHerkulex::ServoHerkulex (int sID, char* const smodel, int verb)
 {
   ID[0] = sID;
   model[0] = mapModel(smodel);
-  verbose_ = verb;
+  verbosity = verb;
 }
 
 ServoHerkulex::ServoHerkulex (std::vector<int> sIDs, std::vector<std::string> smodels, int verb)
@@ -77,12 +77,7 @@ ServoHerkulex::ServoHerkulex (std::vector<int> sIDs, std::vector<std::string> sm
     model[j] = mapModel(smodels[j]);
   }
 
-  verbose_ = verb;
-}
-
-bool ServoHerkulex::setPortLabel (const char* label)
-{
-  return manager.setPortLabel(label);
+  verbosity = verb;
 }
 
 bool ServoHerkulex::reboot (int tID)
@@ -151,13 +146,6 @@ std::vector<uint8_t> ServoHerkulex::getStatus (int tID)
   buf[1] = (uint8_t)tID;
   sendData(buf, 9);
   stat = manager.getAckPacket();
-
-  if (verbose_) {
-    for (unsigned int j = 0; j < stat.size(); j++) {
-      printf("%X ",stat[j]);
-    }
-    printf("\n");
-  }
 
   return stat;
 }
@@ -690,27 +678,12 @@ int ServoHerkulex::getModel (int gID)
 
 int ServoHerkulex::sendData (std::vector<uint8_t>& packet)
 {
-  return manager.sendTx(packet.size()+4, packet, packet[1], verbose_);
+  return manager.sendPacket(packet, packet[1]);
 }
 
 int ServoHerkulex::sendData (std::vector<uint8_t>& packet, int ack_length)
 {
-  return manager.sendTxRx(packet.size()+4, packet, ack_length, packet[1], verbose_);
-}
-
-void ServoHerkulex::addSync(uint8_t goalLSB, uint8_t goalMSB, uint8_t tSET, uint8_t tID)
-{
-  //sync_buffer[c++] = goalLSB;
-  //sync_buffer[c++] = goalLSB;
-  //sync_buffer[c++] = goalLSB;
-  //sync_buffer[c++] = goalLSB;
-}
-
-bool ServoHerkulex::resizeBuffer (int length)
-{
-  manager.resizeData(length);
-
-  return true;
+  return manager.sendreceivePacket(packet, ack_length, packet[1]);
 }
 
 bool ServoHerkulex::actionAll (float playtime)
@@ -754,29 +727,3 @@ bool ServoHerkulex::actionAll ()
   return true;
 }
 
-uint8_t ServoHerkulex::checkSum1 (std::vector<uint8_t> bytes)
-{
-  //if (MIN_PACKET_SIZE < bytes.size() < MAX_PACKET_SIZE) {
-  //  return PACKET_ERR_CS;
-  //}
-  int bs = bytes.size();
-
-  uint8_t cs1 = 0;
-
-  for (int j = 0; j < bs; j++) {
-    cs1 = cs1 ^ bytes[j];
-  }
-  cs1 = cs1 & 0xFE;
-
-  return cs1;
-}
-
-uint8_t ServoHerkulex::checkSum2 (uint8_t cs1)
-{
-  uint8_t cs2 = 0;
-
-  cs2 = ~(cs1);
-  cs2 = cs2 & 0xFE;
-
-  return cs2;
-}

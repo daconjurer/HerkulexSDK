@@ -34,20 +34,22 @@
  *********************************************************************/
  
 /////////////////////////////////////////////////////////////////////////////////////////
-/// @file Packet manager
-/// @author Victor Esteban Sandoval-Luna
+/// @file PacketManager class implementation. This class builds up the HerkuleX protocol
+/// packets for communication with the HerkuleX servomotors.
 ///
+/// @author Victor Esteban Sandoval-Luna
 /////////////////////////////////////////////////////////////////////////////////////////
+
+/* TODO */
+// Check the ACK packet (checksums) to make sure it is not corrupted
 
 #include "../../include/herkulex_sdk/packet_manager.h"
 
 using namespace herkulex;
 
-PacketManager::PacketManager () {
-  // char* a = port.getPortName();
-
-  port.setBaudRate(115200);
-  port.openPort();
+PacketManager::PacketManager ()
+{
+  verbosity = 0;
 
   header[0] = 0xFF;
   header[1] = 0xFF;
@@ -59,95 +61,83 @@ PacketManager::PacketManager () {
   data[0] = 0x00;
 }
 
-int PacketManager::sendTx (int length, std::vector<uint8_t> buf, int ID, int& verb) {
-  pSize = length;
+PacketManager::PacketManager (char* const port_name, const int& baudrate, const int& verb) : port(port_name,baudrate)
+{
+  verbosity = (verb == 0 || verb == 1) ? verb : 0;
+
+  header[0] = 0xFF;
+  header[1] = 0xFF;
+  pSize = 0;
+  CMD = 0;
+  pID = 0;
+  cs1 = 0;
+  cs2 = 0;
+  data[0] = 0x00;
+}
+
+int PacketManager::sendPacket (std::vector<uint8_t> buf, int ID) {
+  int length = buf.size();
+  int n;
+
+  if (length < MIN_BUFFER_LENGTH) {return PACKET_MIN_ERROR;}
+  if (length > MAX_BUFFER_LENGTH) {return PACKET_MAX_ERROR;}
+
+  pSize = length + 4;
   pID = ID;
   CMD = buf[2];
 
-  checkSum1(buf,cs1);
-  checkSum2(cs1,cs2);
+  checkSum1(buf);
+  checkSum2();
 
   buildUp(buf);
+  n = sendTx();
+  
+  if (n == -1) {return COM_TX_FAIL;}
 
-  if (verb)
-    return sendPacket(1);
-  return sendPacket(0);
+  return COM_OK;
 }
 
-int PacketManager::sendTxSync (int length, std::vector<uint8_t> buf, int& verb) {
-  std::vector<uint8_t> buffer = std::vector<uint8_t> (length-7);
+int PacketManager::sendreceivePacket (std::vector<uint8_t> buf, int ack_length, int ID)
+{
+  int length = buf.size();
+  int n_ack;
 
-  pSize = length;
-  pID = buf[1];
-  CMD = buf[2];
+  if (length < MIN_BUFFER_LENGTH) {return PACKET_MIN_ERROR;}
+  if (length > MAX_BUFFER_LENGTH) {return PACKET_MAX_ERROR;}
 
-  // Shifting data
-  for (int i = 0; i < length-7; i++) {
-    buffer[i] = buf[i+3];
-  }
-
-  checkSum1(buffer,cs1);
-  checkSum2(cs1,cs2);
-
-  buildUp(buf);
-
-  int a = 0;
-  std::cout << "sendsync:" << std::endl;
-
-  for (unsigned int i = 0; i < data.size(); i++) {
-    a = data[i];
-    std::cout << a << std::endl;
-  }
-
-  if (verb)
-    return sendPacket(1);
-  return sendPacket(0);
-}
-
-int PacketManager::sendTxRx (int length, std::vector<uint8_t> buf, int ack_length, int ID, int& verb) {
   std::vector<uint8_t> ack = std::vector<uint8_t> (15); // ACK packet length up to 15 bytes
 
-  pSize = length;
+  pSize = length + 4;
   pID = ID;
   CMD = buf[2];
 
-  checkSum1(buf,cs1);
-  checkSum2(cs1,cs2);
+  checkSum1(buf);
+  checkSum2();
 
   buildUp(buf);
+  n_ack = sendTxRx(ack_length);
+  
+  if (n_ack != ack_length) {
+    if (n_ack == -1) {return COM_TX_FAIL;}
+    if (n_ack == 0) {return COM_RX_TIMEOUT;}
+    return COM_RX_FAIL;
+  }
 
-  if (verb)
-    return sendreceivePacket(1, ack_length);
-  return sendreceivePacket(0, ack_length);
+  return COM_OK;
 }
 
-bool PacketManager::setPortLabel (const char* portlabel) {
-  port.setPortName(portlabel);
-  port.openPort();
-
-  return true;
-}
-
-std::vector<uint8_t> PacketManager::getData () {
-  return data;
-}
-
-std::vector<uint8_t> PacketManager::getAckPacket () {
-  return ack_packet;
-}
-
-bool PacketManager::resizeData (int length) {
-  data.resize(length);
-  return true;
-}
-
-int PacketManager::sendPacket (int verbose) {
+int PacketManager::sendTx ()
+{
   int ds = data.size();
   port.clearPort();
   int k = port.writePort(data.data(), ds);
   usleep (ds * 10);
 
-  if (verbose) {
+  if (k != ds) {
+    return -1;
+  }
+
+  if (verbosity) {
     for (int j = 0; j < ds; j++) {
       printf("%X ",data[j]);
     }
@@ -157,7 +147,8 @@ int PacketManager::sendPacket (int verbose) {
   return k;
 }
 
-int PacketManager::sendreceivePacket (int verbose, int ack_length) {
+int PacketManager::sendTxRx (int ack_length)
+{
   ack_packet.resize(ack_length);
   int ds = data.size();
 
@@ -171,7 +162,7 @@ int PacketManager::sendreceivePacket (int verbose, int ack_length) {
     return -1;
   }
 
-  if (verbose) {
+  if (verbosity) {
     for (int j = 0; j < ds; j++) {
       printf("%X ",data[j]);
     }
@@ -181,7 +172,8 @@ int PacketManager::sendreceivePacket (int verbose, int ack_length) {
   return n;
 }
 
-char* PacketManager::buildUp (std::vector<uint8_t> bytes) {
+int PacketManager::buildUp (std::vector<uint8_t> bytes)
+{
   int s = bytes.size();
   data.resize(s + 4);         // 7 - 3 = 4
 
@@ -199,17 +191,18 @@ char* PacketManager::buildUp (std::vector<uint8_t> bytes) {
   data[5] = cs1;
   data[6] = cs2;
 
-  return (char*)"Packet ready.";
+  return 0;
 }
 
-uint8_t PacketManager::checkSum1 (std::vector<uint8_t> bytes, uint8_t& cs1) {
-  //if (MIN_PACKET_SIZE < bytes.size() < MAX_PACKET_SIZE) {
-  //  return PACKET_ERR_CS;
-  //}
+std::vector<uint8_t> PacketManager::getData () const {return data;}
+
+std::vector<uint8_t> PacketManager::getAckPacket () const {return ack_packet;}
+
+uint8_t PacketManager::checkSum1 (std::vector<uint8_t> bytes)
+{
   int bs = bytes.size();
 
   cs1 = 0;
-
   for (int j = 0; j < bs; j++) {
     cs1 = cs1 ^ bytes[j];
   }
@@ -218,11 +211,12 @@ uint8_t PacketManager::checkSum1 (std::vector<uint8_t> bytes, uint8_t& cs1) {
   return cs1;
 }
 
-uint8_t PacketManager::checkSum2 (uint8_t cs1, uint8_t& cs2) {
+uint8_t PacketManager::checkSum2 ()
+{
   cs2 = 0;
-
   cs2 = ~(cs1);
   cs2 = cs2 & 0xFE;
 
   return cs2;
 }
+
