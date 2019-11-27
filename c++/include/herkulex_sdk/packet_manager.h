@@ -1,23 +1,43 @@
-/*******************************************************************************
-* Copyright 2018 Robótica de la Mixteca
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*******************************************************************************/
-
-////////////////////////////////////////////
-/// @file Hovis HerkuleX Packets manager
+/*********************************************************************
+ * Software License Agreement (BSD License)
+ *
+ *  Copyright (c) 2019, Robótica de la Mixteca
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above
+ *     copyright notice, this list of conditions and the following
+ *     disclaimer in the documentation and/or other materials provided
+ *     with the distribution.
+ *   * Neither the name of Universidad Tecnológica de la Mixteca nor
+ *     the names of its contributors may be used to endorse or promote
+ *     products derived from this software without specific prior
+ *     written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ *********************************************************************/
+ 
+/////////////////////////////////////////////////////////////////////////////////////////
+/// @file PacketManager class definition.
 /// @author Victor Esteban Sandoval-Luna
-////////////////////////////////////////////
+///
+/////////////////////////////////////////////////////////////////////////////////////////
 
 #ifndef HERKULEX_SDK_PACKETMANAGER_H_
 #define HERKULEX_SDK_PACKETMANAGER_H_
@@ -32,18 +52,22 @@
 #define MIN_PACKET_SIZE     7
 #define MAX_PACKET_SIZE     233
 
-// Communication Result
-#define PORT_OK             0     // tx or rx packet communication success
-#define PORT_BUSY           -11   // Port is busy
-#define COM_RX_FAIL         -12   // Failed instruction packet transmition
-#define COM_TX_FAIL         -13   // Failed getting status packet
-#define COMM_TX_ERROR       -14   // Incorrect instruction packet
-#define COMM_RX_RECIEVING   -15   // Recieving status packet
-#define COMM_RX_TIMEOUT     -16   // No status packet
-#define COMM_RX_CORRUPT     -17   // Incorrect status packet
+#ifdef MIN_PACKET_SIZE
+  #define MIN_BUFFER_LENGTH (MIN_PACKET_SIZE - 4)
+#endif
 
-// Packet Check
-#define PACKET_ERR_CS       -21   // Checksum error
+#ifdef MAX_PACKET_SIZE
+  #define MAX_BUFFER_LENGTH (MAX_PACKET_SIZE - 4)
+#endif
+
+// Communication Result
+#define COM_OK              0     // Tx or Rx packet communication success
+#define COM_TX_FAIL         -11   // Failed instruction packet transmission
+#define COM_RX_FAIL         -12   // Failed getting status packet
+#define COM_RX_TIMEOUT      -13   // No status packet
+#define COM_RX_CORRUPT      -14   // Incorrect status packet (ACK)
+#define PACKET_MIN_ERROR    -15   // Incorrect instruction packet (MIN)
+#define PACKET_MAX_ERROR    -16   // Incorrect instruction packet (MAX)
 
 namespace herkulex
 {
@@ -51,38 +75,57 @@ namespace herkulex
 class PacketManager
 {
   private:
-    // attributes
+    // Attributes
+    
+    // PortHandler member for reading/writing to serial port
     PortHandler port;
-    std::vector<uint8_t> header = std::vector<uint8_t> (2);
+    // Size of the packet
     uint8_t pSize;
+    // Command code (see datasheet)
     uint8_t CMD;
+    // Servo ID
     uint8_t pID;
+    // Checksum1 result (see datasheet)
     uint8_t cs1;
+    // Checksum2 result (see datasheet)
     uint8_t cs2;
+    // Packet header (see datasheet)
+    std::vector<uint8_t> header = std::vector<uint8_t> (2);
+    // Actual data of the packet (see datasheet)
     std::vector<uint8_t> data = std::vector<uint8_t> (1);
+    // ACK packet, stores the ACK sent by the servo (see datasheet)
     std::vector<uint8_t> ack_packet = std::vector<uint8_t> (15);
+    
+    // Verbosity
+    int verbosity;
 
-    // methods
-    int sendPacket (int verbose);
-    int sendreceivePacket (int verbose, int ack_length);
-    char *buildUp (std::vector<uint8_t> bytes);
-    uint8_t checkSum1 (std::vector<uint8_t> bytes, uint8_t& cs1);
-    uint8_t checkSum2 (uint8_t cs1, uint8_t& cs2);
+    // Methods
+    
+    // Writes the data to serial port using PorHandler member
+    int sendTx ();
+    // Writes to and reads from serial port using PorHandler member
+    int sendTxRx (int ack_length);
+    // Builds up the packet adding the header and the checksums (see datasheet)
+    int buildUp (std::vector<uint8_t> bytes);
+    // Checksums methods for error checking (see datasheet)
+    uint8_t checkSum1 (std::vector<uint8_t> bytes);
+    uint8_t checkSum2 ();
 
   public:
-
+    // Constructors
     PacketManager ();
+    PacketManager (const int& verb);
+    PacketManager (char* port_name, const int& baudrate, const int& verb);
     virtual ~PacketManager () { }
 
-    int sendTx (int length, std::vector<uint8_t> buf, int ID, int& verb);
-    int sendTxSync (int length, std::vector<uint8_t> buf, int& verb);
-    int sendTxRx (int length, std::vector<uint8_t> buf, int ack_length, int ID, int& verb);
-    bool setPortLabel (const char* portlabel);
+    // Sends the packet (this method interacts with the ServoHerkulex object directly)
+    int sendPacket (std::vector<uint8_t> buf, int ID);
+    // Sends the packet and reads the ACK (this method interacts with the ServoHerkulex object directly)
+    int sendreceivePacket (std::vector<uint8_t> buf, int ack_length, int ID);
 
-    std::vector<uint8_t> getData ();
-    std::vector<uint8_t> getAckPacket ();
-
-    bool resizeData (int length);
+    // Debug methods (get the instruction packet and ACK packet, respectively)
+    std::vector<uint8_t> getData () const;
+    std::vector<uint8_t> getAckPacket () const;
 };
 
 }
