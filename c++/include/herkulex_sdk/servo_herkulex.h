@@ -123,16 +123,11 @@ class ServoHerkulex
     bool actionAll (float playtime);
     bool actionAll ();
 
-<<<<<<< HEAD
-    // uint16_t getPosition (int tID);
-
     uint8_t checkSum1 (std::vector<uint8_t> bytes);
     uint8_t checkSum2 (uint8_t cs1);
-=======
     // These methods will allow model tracing *****
     int mapModel (std::string mmodel);
     std::string remapModel (int mmodel);
->>>>>>> 09729b865c8032690e2e549efbfffcd0067f6393
 
   public:
     // Constructors
