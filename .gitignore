@@ -1,2 +1,4 @@
-#ignore examples folder
-c++/example
+#ignore
+c++/build/.objects/
+c++/build/libhklx_linux_x86.so
+c++/example/
