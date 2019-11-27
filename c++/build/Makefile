@@ -3,11 +3,7 @@
 ###### Herkulex_SDK for Hovis HerkuleX servos Makefile
 ######################################################
 
-<<<<<<< HEAD
-# Compiler, Flags and Target name
-=======
-  # Compiler, Flags and Target name
->>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
+ # Compiler, Flags and Target name
 
 DIR_HERKULEX      = ..
 DIR_OBJECTS       = ./.objects
@@ -31,28 +27,18 @@ CXFLAGS           = -Wall -std=c++11 -c $(INCLUDES) $(FORMAT) -fPIC -g
 FORMAT            = -m64
 INCLUDES          += -I$(DIR_HERKULEX)/include/herkulex_sdk
 
-<<<<<<< HEAD
-# Required external libraries
+ # Required external libraries
 LIBRARIES         += -lrt
 
-# SDK Files
-=======
-  # Required external libraries
-LIBRARIES         += -lrt
+ # SDK Files
 
-  # SDK Files
->>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
 SOURCES           = $(DIR_HERKULEX)/src/herkulex_sdk/port_handler.cpp \
                     $(DIR_HERKULEX)/src/herkulex_sdk/packet_manager.cpp \
                     $(DIR_HERKULEX)/src/herkulex_sdk/servo_herkulex.cpp
 
 OBJECTS           = $(addsuffix .o,$(addprefix $(DIR_OBJECTS)/,$(basename $(notdir $(SOURCES)))))
 
-<<<<<<< HEAD
-# COMPILING RULES
-=======
-  # COMPILING RULES
->>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
+ # COMPILING RULES
 $(TARGET): makedirs $(OBJECTS)
 	$(LD) $(LDFLAGS) -o ./$(TARGET) $(OBJECTS) $(LIBRARIES)
 
@@ -63,19 +49,12 @@ clean:
 	rm -f $(OBJECTS) ./$(TARGET)
 
 install: $(TARGET)
-<<<<<<< HEAD
-# copy the binaries into the lib directory
+
+ # copy the binaries into the lib directory
 	@$(CHECK_DIR_EXISTS) $(INSTALL_ROOT)/lib || $(MKDIR) $(INSTALL_ROOT)/lib
 	-$(CP) "./$(TARGET)" "$(INSTALL_ROOT)/lib/$(TARGET)"
 
-# copy the headers into the include directory
-=======
-  # copy the binaries into the lib directory
-	@$(CHECK_DIR_EXISTS) $(INSTALL_ROOT)/lib || $(MKDIR) $(INSTALL_ROOT)/lib
-	-$(CP) "./$(TARGET)" "$(INSTALL_ROOT)/lib/$(TARGET)"
-
-  # copy the headers into the include directory
->>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
+ # copy the headers into the include directory
 	@$(CHECK_DIR_EXISTS) $(INSTALL_ROOT)/include/herkulex_sdk || $(MKDIR) $(INSTALL_ROOT)/include/herkulex_sdk
 	$(CP_ALL) $(DIR_HERKULEX)/include/herkulex_sdk/* $(INSTALL_ROOT)/include/herkulex_sdk
 
@@ -89,11 +68,7 @@ uninstall:
 
 reinstall: uninstall install
 
-<<<<<<< HEAD
-# Make rules for .cpp files in each directory
-=======
-  # Make rules for .cpp files in each directory
->>>>>>> 894c00d04c33452831ec17e00d2cfe60ca918ba7
+ # Make rules for .cpp files in each directory
 $(DIR_OBJECTS)/%.o: $(DIR_HERKULEX)/src/herkulex_sdk/%.cpp
 	$(CX) $(CXFLAGS) -c $? -o $@
 

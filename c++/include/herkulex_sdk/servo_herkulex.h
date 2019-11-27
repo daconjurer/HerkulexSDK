@@ -165,11 +165,7 @@ class ServoHerkulex
     bool moveAsync (std::vector<int> goal, std::vector<int> tID, std::vector<int> tLED, std::vector<float> playtime);
 
     std::vector<std::string> getModels ();
-<<<<<<< HEAD
-    std::vector<int> getIDs ();
-=======
     std::vector<int> getIDs () const;
->>>>>>> 09729b865c8032690e2e549efbfffcd0067f6393
     float getAngle0601 (int tID);
     float getAngle0201 (int tID);
     int getSpeed (int tID);
