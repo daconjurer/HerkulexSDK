@@ -61,6 +61,13 @@ ServoHerkulex::ServoHerkulex (const int& verb) : manager(verb)
   verbosity = verb;
 }
 
+ServoHerkulex::ServoHerkulex (char* port_name, const int& baudrate, const int& verb) : manager(port_name,baudrate,verb)
+{
+  ID[0] = 0;
+  model[0] = H0201;
+  verbosity = verb;
+}
+
 bool ServoHerkulex::reboot (int tID)
 {
   std::vector<uint8_t> buf = {0x07, 0x00, HX_REBOOT};  // Reboot sequence
