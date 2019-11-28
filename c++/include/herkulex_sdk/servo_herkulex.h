@@ -125,9 +125,6 @@ class ServoHerkulex
 
     uint8_t checkSum1 (std::vector<uint8_t> bytes);
     uint8_t checkSum2 (uint8_t cs1);
-    // These methods will allow model tracing *****
-    int mapModel (std::string mmodel);
-    std::string remapModel (int mmodel);
 
   public:
     // Constructors
