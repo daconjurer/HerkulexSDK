@@ -516,18 +516,6 @@ bool ServoHerkulex::moveAsync (std::vector<int> goal, std::vector<int> tID, std:
 
 }
 
-std::vector<std::string> ServoHerkulex::getModels ()
-{
-  int s = model.size();
-  std::vector<std::string> models = std::vector<std::string> (s);
-
-  for (int j = 0 ; j < s; j++) {
-    models[j] = remapModel(model[j]);
-  }
-
-  return models;
-}
-
 std::vector<int> ServoHerkulex::getIDs () const {return ID;}
 
 
@@ -591,27 +579,6 @@ int ServoHerkulex::getSpeed (int tID)
   sp = ((ack[10]&0xFF) << 8) | ack[9];
 
 	return sp;
-}
-
-/*****/
-int ServoHerkulex::mapModel (std::string mmodel)
-{
-  if (mmodel == "0101") {
-    return H0101;
-  }
-  else if (mmodel == "0201") {
-    return H0201;
-  }
-  else if (mmodel == "0401") {
-    return H0401;
-  }
-  else if (mmodel == "0601") {
-    return H0601;
-  }
-  else {
-    std::cout << "Invalid model " << mmodel << ": setting default (O201)." <<  std::endl;
-    return H0201;
-  }
 }
 
 int ServoHerkulex::pingID (int tID)
