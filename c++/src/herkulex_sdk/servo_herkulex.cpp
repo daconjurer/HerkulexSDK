@@ -41,8 +41,8 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 /* TODO */
-// Check functionality of the constructor that takes IDs and models vectors as arguments (this is intended for traceability)
-// Complete Models and IDs retrieving. Refer to ***** here and in the Header file
+// Add constructor that checks the servos are OK given a set of IDs and a set of models.
+// Add the setBaudrate methods (should them set the baudrate for one servo or a set of servos)
 
 #include "../../include/herkulex_sdk/servo_herkulex.h"
 
@@ -58,34 +58,6 @@ ServoHerkulex::ServoHerkulex (const int& verb) : manager(verb)
 {
   ID[0] = 0;
   model[0] = H0201;
-  verbosity = verb;
-}
-
-ServoHerkulex::ServoHerkulex (char* port_name, const int& baudrate, const int& verb) : manager(port_name,baudrate,verb)
-{
-  ID[0] = 0;
-  model[0] = H0201;
-  verbosity = verb;
-}
-
-ServoHerkulex::ServoHerkulex (char* port_name, const int& baudrate, const int& sID, char* const smodel, const int& verb) : manager(port_name,baudrate,verb)
-{
-  ID[0] = sID;
-  model[0] = mapModel(smodel);
-  verbosity = verb;
-}
-
-ServoHerkulex::ServoHerkulex (char* port_name, const int& baudrate, std::vector<int> sIDs, std::vector<std::string> smodels, const int& verb) : manager(port_name,baudrate,verb)
-{
-  int size = sIDs.size();
-
-  ID.resize(size);
-  model.resize(size);
-  for (int j = 0 ; j < size; j++) {
-    ID[j] = sIDs[j];
-    model[j] = mapModel(smodels[j]);
-  }
-
   verbosity = verb;
 }
 
@@ -640,24 +612,6 @@ int ServoHerkulex::mapModel (std::string mmodel)
     std::cout << "Invalid model " << mmodel << ": setting default (O201)." <<  std::endl;
     return H0201;
   }
-}
-
-/*****/
-std::string ServoHerkulex::remapModel (int mmodel)
-{
-  if (mmodel == H0101) {
-    return "0101";
-  }
-  else if (mmodel == H0201) {
-    return "0201";
-  }
-  else if (mmodel == H0401) {
-    return "0401";
-  }
-  else if (mmodel == H0601) {
-    return "0601";
-  }
-  else return '\0';
 }
 
 int ServoHerkulex::pingID (int tID)
