@@ -130,8 +130,6 @@ class ServoHerkulex
     // Constructors
     ServoHerkulex (const int& verb);
     ServoHerkulex (char* port_name, const int& baudrate, const int& verb);
-    ServoHerkulex (char* port_name, const int& baudrate, const int& tID, char* smodel, const int& verb);
-    ServoHerkulex (char* port_name, const int& baudrate, std::vector<int> sIDs, std::vector<std::string> smodels, const int& verb);
 
     //     // Hovis HerkuleX servos class
     bool reboot (int sID);
