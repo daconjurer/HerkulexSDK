@@ -1,4 +1,14 @@
 #ignore
 c++/build/.objects/
 c++/build/libhklx_linux_x86.so
-c++/example/
+c++/test/
+c++/example/angulos_limites/
+c++/example/girar_manija/
+c++/example/girar_manija2/
+c++/example/griper/
+c++/example/herkulex/
+c++/example/hklx_arm/
+c++/example/muneca/
+c++/example/polymorphism/
+c++/example/read_write/read_write
+c++/example/read_write/.objects/

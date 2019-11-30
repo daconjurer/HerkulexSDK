@@ -49,6 +49,7 @@ using namespace herkulex;
 
 PacketManager::PacketManager ()
 {
+  port.openPort();
   verbosity = 0;
 
   header[0] = 0xFF;
@@ -63,6 +64,7 @@ PacketManager::PacketManager ()
 
 PacketManager::PacketManager (const int& verb)
 {
+  port.openPort();
   verbosity = (verb == 0 || verb == 1) ? verb : 0;
 
   header[0] = 0xFF;
@@ -77,6 +79,7 @@ PacketManager::PacketManager (const int& verb)
 
 PacketManager::PacketManager (char* const port_name, const int& baudrate, const int& verb) : port(port_name,baudrate)
 {
+  port.openPort();
   verbosity = (verb == 0 || verb == 1) ? verb : 0;
 
   header[0] = 0xFF;
