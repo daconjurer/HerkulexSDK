@@ -32,12 +32,9 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
- 
+
 /////////////////////////////////////////////////////////////////////////////////////////
-/// @file PacketManager class implementation. This class builds up the HerkuleX protocol
-/// packets for communication with the HerkuleX servomotors.
-///
-/// @author Victor Esteban Sandoval-Luna
+// @author Victor Esteban Sandoval-Luna
 /////////////////////////////////////////////////////////////////////////////////////////
 
 /* TODO */
