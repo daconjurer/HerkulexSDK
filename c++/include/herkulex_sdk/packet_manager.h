@@ -32,11 +32,16 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
- 
+
+/*!
+  \file
+  \brief PacketManager class definition.
+  
+  The PacketManager class builds up the HerkuleX packets based on the function requested by the user through the ServoHerkulex instance. It also has methods for sending and recieving such packets to and from the servomotors through serial port using a PortHandler instance.
+*/
+
 /////////////////////////////////////////////////////////////////////////////////////////
-/// @file PacketManager class definition.
-/// @author Victor Esteban Sandoval-Luna
-///
+// @author Victor Esteban Sandoval-Luna
 /////////////////////////////////////////////////////////////////////////////////////////
 
 #ifndef HERKULEX_SDK_PACKETMANAGER_H_
@@ -47,31 +52,81 @@
 
 #include "port_handler.h"
 
+/** \brief ID for broadcasting i.e. all the servos follow the instruction.
+ 
+ When using the broadcast ID in the packet, all the servos that are connected will execute the command unless their Error flag is UP.
+ */
 #define BROADCAST_ID        0xFE
-
+/** \brief Minimum packet size. All the packets should be at least 7 bytes in lenght. Please see the 
+ 
+ When using the broadcast ID in the packet, all the servos that are connected will execute the command unless the Error flag is UP.
+ */
 #define MIN_PACKET_SIZE     7
+/** \brief ID for boradcasting i.e. all the servos follow the instruction.
+ 
+ When using the broadcast ID in the packet, all the servos that are connected will execute the command unless the Error flag is UP.
+ */
 #define MAX_PACKET_SIZE     233
-
+/** \brief ID for boradcasting i.e. all the servos follow the instruction.
+ 
+ When using the broadcast ID in the packet, all the servos that are connected will execute the command unless the Error flag is UP.
+ */
 #ifdef MIN_PACKET_SIZE
   #define MIN_BUFFER_LENGTH (MIN_PACKET_SIZE - 4)
 #endif
-
+/** \brief ID for boradcasting i.e. all the servos follow the instruction.
+ 
+ When using the broadcast ID in the packet, all the servos that are connected will execute the command unless the Error flag is UP.
+ */
 #ifdef MAX_PACKET_SIZE
   #define MAX_BUFFER_LENGTH (MAX_PACKET_SIZE - 4)
 #endif
-
 // Communication Result
+
+/** \brief ID for boradcasting i.e. all the servos follow the instruction.
+ 
+ When using the broadcast ID in the packet, all the servos that are connected will execute the command unless the Error flag is UP.
+ */
 #define COM_OK              0     // Tx or Rx packet communication success
+/** \brief ID for boradcasting i.e. all the servos follow the instruction.
+ 
+ When using the broadcast ID in the packet, all the servos that are connected will execute the command unless the Error flag is UP.
+ */
 #define COM_TX_FAIL         -11   // Failed instruction packet transmission
+/** \brief ID for boradcasting i.e. all the servos follow the instruction.
+ 
+ When using the broadcast ID in the packet, all the servos that are connected will execute the command unless the Error flag is UP.
+ */
 #define COM_RX_FAIL         -12   // Failed getting status packet
+/** \brief ID for boradcasting i.e. all the servos follow the instruction.
+ 
+ When using the broadcast ID in the packet, all the servos that are connected will execute the command unless the Error flag is UP.
+ */
 #define COM_RX_TIMEOUT      -13   // No status packet
+/** \brief ID for boradcasting i.e. all the servos follow the instruction.
+ 
+ When using the broadcast ID in the packet, all the servos that are connected will execute the command unless the Error flag is UP.
+ */
 #define COM_RX_CORRUPT      -14   // Incorrect status packet (ACK)
+/** \brief ID for boradcasting i.e. all the servos follow the instruction.
+ 
+ When using the broadcast ID in the packet, all the servos that are connected will execute the command unless the Error flag is UP.
+ */
 #define PACKET_MIN_ERROR    -15   // Incorrect instruction packet (MIN)
+/** \brief ID for boradcasting i.e. all the servos follow the instruction.
+ 
+ When using the broadcast ID in the packet, all the servos that are connected will execute the command unless the Error flag is UP.
+ */
 #define PACKET_MAX_ERROR    -16   // Incorrect instruction packet (MAX)
 
 namespace herkulex
 {
 
+/**
+  \brief It handles the HerkuleX commands.
+  
+  The PacketManager class builds up the HerkuleX packets based on the function requested by the user through the ServoHerkulex instance. It also has methods for sending and recieving such packets to and from the servomotors through serial port using a PortHandler instance.
+*/
 class PacketManager
 {
   private:

@@ -32,11 +32,16 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
- 
+
+/*!
+  \file
+  \brief PortHandler class definition.
+  
+  The PortHandler class enables the Linux serial port for writing and reading. It has configuration methods that allow serial port communication using USB-to-TTL converters.
+*/
+
 /////////////////////////////////////////////////////////////////////////////////////////
-/// @file PortHandler class definition.
-/// @author Victor Esteban Sandoval-Luna
-///
+// @author Victor Esteban Sandoval-Luna
 /////////////////////////////////////////////////////////////////////////////////////////
 
 #ifndef HERKULEX_SDK_PORTHANDLER_H_
@@ -54,26 +59,35 @@
 namespace herkulex
 {
 
+/**
+  \brief It configures and enables the serial port in Lunx.
+  
+  The PacketManager class builds up the HerkuleX packets based on the function requested by the user through the ServoHerkulex instance. It also has methods for sending and recieving such packets to and from the servomotors through serial port using a PortHandler instance.
+*/
 class PortHandler
 {
   private:
     // Attributes
-    char*   port_name_;
-    int     socket_fd_;
-    int     baudrate_;
+    char*   port_name_; // The port name label
+    int     socket_fd_; // The socket status flag
+    int     baudrate_; // The baudrate of the port (see the speed_t definitions in termios.h)
+
+    // Default Baudrate
+    const int DEFAULT_BAUDRATE = 115200;
 
     // Methods
 
     // Sets the attributes of the serial interface
     int setInterfaceAttribs (const int& fd, const int& baudrate, const int& parity);
 
-    // Default Baudrate
-		const int DEFAULT_BAUDRATE = 115200;
-
   public:
     // Constructors
-    PortHandler ();
-    PortHandler (char* portname, const int& baudrate);
+    PortHandler (); /**< Default constructor */
+    PortHandler (char* portname, const int& baudrate); /**< Constructor with name label and baudrate
+    * @param portname The port name label.
+    * @param baudrate The baudrate in bps.
+    *
+     */
 
     virtual ~PortHandler() { }
 

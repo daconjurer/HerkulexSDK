@@ -32,11 +32,16 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
- 
+
+/*!
+  \file
+  \brief ServoHerkulex class definition.
+  
+  The ServoHerkulex class offers high level functions for controlling, monitoring and defining the behavior of the HerkuleX servomotors using a serial port on Linux.
+*/
+
 /////////////////////////////////////////////////////////////////////////////////////////
-/// @file ServoHerkulex class definition.
-/// @author Victor Esteban Sandoval-Luna
-///
+// @author Victor Esteban Sandoval-Luna
 /////////////////////////////////////////////////////////////////////////////////////////
 
 #ifndef HERKULEX_SDK_SERVOHERKULEX_H_
@@ -93,6 +98,11 @@
 namespace herkulex
 {
 
+/**
+  \brief It provides the abstraction layer for the servomotors functions.
+  
+  The ServoHerkulex class offers high level functions for controlling, monitoring and defining the behavior of the HerkuleX servomotors using a serial port on Linux.
+*/
 class ServoHerkulex
 {
   private:
@@ -168,3 +178,4 @@ class ServoHerkulex
 }
 
 #endif
+

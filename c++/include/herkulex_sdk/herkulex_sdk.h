@@ -33,15 +33,16 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/////////////////////////////////////////////////////////////////////////////////////////
-/// @file Hovis HerkuleX SDK libraries
-/////////////////////////////////////////////////////////////////////////////////////////
+/**
+  \file
+  \brief HerkuleX SDK libraries
+*/
 
 #ifndef HERKULEX_SDK_INCLUDE_HERKULEX_SDK_HERKULEXSDK_H_
 #define HERKULEX_SDK_INCLUDE_HERKULEX_SDK_HERKULEXSDK_H_
 
-#include "port_handler.h"
-#include "packet_manager.h"
-#include "servo_herkulex.h"
+#include "port_handler.h"    // This file manages the serial port in linux
+#include "packet_manager.h"  // This file builds up the HerkuleX communication packets
+#include "servo_herkulex.h"  // This file provides control functions for the HerkuleX servos
 
 #endif
