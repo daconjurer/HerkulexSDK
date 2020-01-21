@@ -181,6 +181,8 @@ class PacketManager
     // Debug methods (get the instruction packet and ACK packet, respectively)
     std::vector<uint8_t> getData () const;
     std::vector<uint8_t> getAckPacket () const;
+
+    void endPacketManager ();
 };
 
 }

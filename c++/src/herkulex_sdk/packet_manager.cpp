@@ -234,3 +234,8 @@ uint8_t PacketManager::checkSum2 ()
   return cs2;
 }
 
+void PacketManager::endPacketManager ()
+{
+  port.closePort();
+}
+
