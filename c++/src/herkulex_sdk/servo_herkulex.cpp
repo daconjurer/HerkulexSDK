@@ -662,3 +662,8 @@ bool ServoHerkulex::actionAll ()
   return true;
 }
 
+void ServoHerkulex::closeHerkuleX ()
+{
+  manager.endPacketManager();
+}
+

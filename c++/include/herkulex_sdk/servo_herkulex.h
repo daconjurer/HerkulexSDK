@@ -133,9 +133,6 @@ class ServoHerkulex
     bool actionAll (float playtime);
     bool actionAll ();
 
-    uint8_t checkSum1 (std::vector<uint8_t> bytes);
-    uint8_t checkSum2 (uint8_t cs1);
-
   public:
     // Constructors
     ServoHerkulex (const int& verb);
@@ -173,6 +170,7 @@ class ServoHerkulex
     uint16_t getPosition0201 (int tID);
     uint16_t getPosition0601 (int tID);
 
+    void closeHerkuleX ();
 };
 
 }
