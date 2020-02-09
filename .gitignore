@@ -14,3 +14,6 @@ c++/example/read_write/read_write
 c++/example/read_write/.objects/
 html/
 latex/
+
+#temp ignore
+c++/src/
