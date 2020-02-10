@@ -14,4 +14,5 @@ c++/build/libhklx_linux_x86.so
 #c++/example/read_write/.objects/
 html/
 latex/
-#c++/src/
+c++/src/herkulex_sdk/packet_manager.cpp
+c++/src/herkulex_sdk/servo_herkulex.cpp
