@@ -33,16 +33,10 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/*!
-  \file
+/**
+  \file port_handler.h
   \brief PortHandler class definition.
-  
-  The PortHandler class enables the Linux serial port for writing and reading. It has configuration methods that allow serial port communication using USB-to-TTL converters.
 */
-
-/////////////////////////////////////////////////////////////////////////////////////////
-// @author Victor Esteban Sandoval-Luna
-/////////////////////////////////////////////////////////////////////////////////////////
 
 #ifndef HERKULEX_SDK_PORTHANDLER_H_
 #define HERKULEX_SDK_PORTHANDLER_H_
@@ -60,62 +54,80 @@ namespace herkulex
 {
 
 /**
-  \brief It configures and enables the serial port in Lunx.
+  \brief It configures and enables the serial port in Linux.
   
-  The PacketManager class builds up the HerkuleX packets based on the function requested by the user through the ServoHerkulex instance. It also has methods for sending and recieving such packets to and from the servomotors through serial port using a PortHandler instance.
+  The PortHandler class enables the Linux serial port for writing and
+  reading. It has configuration methods that allow serial port
+  communication using USB-to-TTL converters.
+  
+  \author Victor Esteban Sandoval-Luna
 */
 class PortHandler
 {
   private:
-    // Attributes
-    char*   port_name_; // The port name label
-    int     socket_fd_; // The socket status flag
-    int     baudrate_; // The baudrate of the port (see the speed_t definitions in termios.h)
+    /* Attributes */
+    /** The port name label. */
+    char*   port_name_;
+    /** The socket status flag. */
+    int     socket_fd_;
+    /** The baudrate of the port (see the speed_t definitions in
+    termios.h). */
+    int     baudrate_;
 
-    // Default Baudrate
+    /** Default Baudrate. */
     const int DEFAULT_BAUDRATE = 115200;
 
-    // Methods
+    /* Methods */
 
-    // Sets the attributes of the serial interface
-    int setInterfaceAttribs (const int& fd, const int& baudrate, const int& parity);
+    /** Sets the attributes of the serial interface. */
+    int setInterfaceAttribs (const int& fd, const int& baudrate,
+      const int& parity);
 
   public:
-    // Constructors
-    PortHandler (); /**< Default constructor */
-    PortHandler (char* portname, const int& baudrate); /**< Constructor with name label and baudrate
-    * @param portname The port name label.
-    * @param baudrate The baudrate in bps.
-    *
-     */
+    /* Constructors */
+    /** Default constructor.
+      The default constructor uses the label "/dev/ttyUSB0" as the name
+      of the USB-to-TTL device and sets 115200 as the port's
+      communication speed. */
+    PortHandler ();
+    /** Constructor with port name and baudrate parameters.
+      This constructor uses the portname parameter as the name of the
+      USB-to-TTL device and the baudrate parameter for setting the
+      communication speed (between 9600 bps and 460800 bps).
+      \param portname The port name label e.g. "/dev/ttACM0".
+      \param baudrate The baudrate in bps e.g. 9600. */
+    PortHandler (char* portname, const int& baudrate);
 
     virtual ~PortHandler() { }
 
-    // Opens the serial port
+    /** Opens the serial port using the port_name_, the baudrate_ and
+      the socket_fd_ attributes. */
     bool openPort();
 
-    // Closes the serial port
+    /** Closes the serial port using the socket_fd_ attribute. */
     void closePort();
 
-    // Clears the port
+    /** Clears the serial port with tcflush. */
     void clearPort();
 
-    // Sets the name of the port
-    void setPortName(char* port_name);
-
-    // Gets the name of the port
-    char* getPortName () const;
-
-    // Sets the baudrate of the port
+    /** Sets the baudrate of the port. */
     int setBaudRate(const int& baudrate);
 
-    // Gets the number of bits available for reading from the port buffer
+    /** Retrieves the name of the port, for debug purposes. */
+    char* getPortName () const;
+
+    /** Gets the number of bytes available for reading from the port
+    buffer. */
     int getBytesAvailable ();
 
-    // Reads port
+    /** Reads from port.
+      \param packet The packet of bytes that is to be sent.
+      \param length The length of the packet (in bytes). */
     int readPort(uint8_t *packet, const int& length);
 
-    // Writes to port
+    /** Writes to port.
+      \param packet The packet of bytes that is to be sent.
+      \param length The length of the packet (in bytes). */
     int writePort(uint8_t *packet, const int& length);
 };
 

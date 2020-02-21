@@ -43,3 +43,6 @@ This project is licensed under the BSD 3-Clause License - see the [LICENSE.md](L
 * The code is strongly based on the ROBOTIS Dynamixel SDK (Protocol1.0/2.0) https://github.com/ROBOTIS-GIT/DynamixelSDK part of the ROBOTIS Official GitHub ([ROBOTIS-GIT](https://github.com/ROBOTIS-GIT)).
 
 
+## Note
+
+* The HerkuleX trademark is property of HYULIMROBOT. This SDK intends to be an API for developers and is free software.

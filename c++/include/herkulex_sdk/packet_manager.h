@@ -33,16 +33,11 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/*!
+/**
   \file
-  \brief PacketManager class definition.
-  
-  The PacketManager class builds up the HerkuleX packets based on the function requested by the user through the ServoHerkulex instance. It also has methods for sending and recieving such packets to and from the servomotors through serial port using a PortHandler instance.
+  \brief PacketManager class definition. Please see the PacketManager
+  class for further reference
 */
-
-/////////////////////////////////////////////////////////////////////////////////////////
-// @author Victor Esteban Sandoval-Luna
-/////////////////////////////////////////////////////////////////////////////////////////
 
 #ifndef HERKULEX_SDK_PACKETMANAGER_H_
 #define HERKULEX_SDK_PACKETMANAGER_H_
@@ -52,72 +47,87 @@
 
 #include "port_handler.h"
 
-/** \brief ID for broadcasting i.e. all the servos follow the instruction.
- 
- When using the broadcast ID in the packet, all the servos that are connected will execute the command unless their Error flag is UP.
- */
+/**
+  \brief Value for broadcasting i.e. all the servos follow the
+  instruction.
+  
+  When using the broadcast ID in the packet, all the servos that are
+  connected will execute the command unless their Error flag is UP.
+*/
 #define BROADCAST_ID        0xFE
-/** \brief Minimum packet size. All the packets should be at least 7 bytes in lenght. Please see the 
- 
- When using the broadcast ID in the packet, all the servos that are connected will execute the command unless the Error flag is UP.
- */
+/** \brief Minimum HerkuleX packet size.
+    
+    All the packets should be at least 7 bytes in length (no data).
+    Please see the datasheet for further details.
+*/
 #define MIN_PACKET_SIZE     7
-/** \brief ID for boradcasting i.e. all the servos follow the instruction.
- 
- When using the broadcast ID in the packet, all the servos that are connected will execute the command unless the Error flag is UP.
- */
+/**
+  \brief Maximum HerkuleX packet size.
+  
+  All the packets should have at most 233 bytes in length. Please see
+  the datasheet for further details.
+*/
 #define MAX_PACKET_SIZE     233
-/** \brief ID for boradcasting i.e. all the servos follow the instruction.
- 
- When using the broadcast ID in the packet, all the servos that are connected will execute the command unless the Error flag is UP.
- */
+/**
+  \brief Minimum buffer actual length.
+  
+  This buffer represents the packet without the header and the
+  checksum values. Therefore the minimum value is 3.
+*/
 #ifdef MIN_PACKET_SIZE
   #define MIN_BUFFER_LENGTH (MIN_PACKET_SIZE - 4)
 #endif
-/** \brief ID for boradcasting i.e. all the servos follow the instruction.
- 
- When using the broadcast ID in the packet, all the servos that are connected will execute the command unless the Error flag is UP.
- */
+/**
+  \brief Maximum buffer actual length.
+  
+  This buffer represents the packet without the header and the
+  checksum values. Therefore the maximum value is 229.
+*/
 #ifdef MAX_PACKET_SIZE
   #define MAX_BUFFER_LENGTH (MAX_PACKET_SIZE - 4)
 #endif
-// Communication Result
-
-/** \brief ID for boradcasting i.e. all the servos follow the instruction.
- 
- When using the broadcast ID in the packet, all the servos that are connected will execute the command unless the Error flag is UP.
- */
-#define COM_OK              0     // Tx or Rx packet communication success
-/** \brief ID for boradcasting i.e. all the servos follow the instruction.
- 
- When using the broadcast ID in the packet, all the servos that are connected will execute the command unless the Error flag is UP.
- */
-#define COM_TX_FAIL         -11   // Failed instruction packet transmission
-/** \brief ID for boradcasting i.e. all the servos follow the instruction.
- 
- When using the broadcast ID in the packet, all the servos that are connected will execute the command unless the Error flag is UP.
- */
-#define COM_RX_FAIL         -12   // Failed getting status packet
-/** \brief ID for boradcasting i.e. all the servos follow the instruction.
- 
- When using the broadcast ID in the packet, all the servos that are connected will execute the command unless the Error flag is UP.
- */
-#define COM_RX_TIMEOUT      -13   // No status packet
-/** \brief ID for boradcasting i.e. all the servos follow the instruction.
- 
- When using the broadcast ID in the packet, all the servos that are connected will execute the command unless the Error flag is UP.
- */
-#define COM_RX_CORRUPT      -14   // Incorrect status packet (ACK)
-/** \brief ID for boradcasting i.e. all the servos follow the instruction.
- 
- When using the broadcast ID in the packet, all the servos that are connected will execute the command unless the Error flag is UP.
- */
-#define PACKET_MIN_ERROR    -15   // Incorrect instruction packet (MIN)
-/** \brief ID for boradcasting i.e. all the servos follow the instruction.
- 
- When using the broadcast ID in the packet, all the servos that are connected will execute the command unless the Error flag is UP.
- */
-#define PACKET_MAX_ERROR    -16   // Incorrect instruction packet (MAX)
+/**
+  \brief Communication result.
+  
+  Tx or Rx communication successful result.
+*/
+#define COM_OK              0
+/**
+  \brief Packet transmission fail result.
+  
+  The packet transmission failed.
+*/
+#define COM_TX_FAIL         -11
+/**
+  \brief Packet reception fail result.
+  
+  The status packet (ACK) reception failed.
+*/
+#define COM_RX_FAIL         -12
+/**
+  \brief Timed out reception result.
+  
+  No status packet (ACK) was received.
+*/
+#define COM_RX_TIMEOUT      -13
+/**
+  \brief Corrupted packet result.
+  
+  The status packet (ACK) is corrupted.
+*/
+#define COM_RX_CORRUPT      -14
+/**
+  \brief Command packet .
+  
+  Incorrect command packet (MIN).
+*/
+#define PACKET_MIN_ERROR    -15
+/**
+  \brief Command packet .
+  
+  The command packet is longer (MAX).
+*/
+#define PACKET_MAX_ERROR    -16
 
 namespace herkulex
 {
@@ -125,63 +135,85 @@ namespace herkulex
 /**
   \brief It handles the HerkuleX commands.
   
-  The PacketManager class builds up the HerkuleX packets based on the function requested by the user through the ServoHerkulex instance. It also has methods for sending and recieving such packets to and from the servomotors through serial port using a PortHandler instance.
+  The PacketManager class builds up the HerkuleX packets based on the
+  function requested by the user through the ServoHerkulex instance.
+  It also has methods for sending and recieving such packets to and from
+  the servomotors through serial port using a PortHandler instance.
+  
+  \author Victor Esteban Sandoval-Luna
 */
 class PacketManager
 {
   private:
-    // Attributes
-    
-    // PortHandler member for reading/writing to serial port
+    /* Attributes */
+    /** PortHandler member for reading/writing from/to serial port */
     PortHandler port;
-    // Size of the packet
+    /** Size of the packet */
     uint8_t pSize;
-    // Command code (see datasheet)
+    /** Command code (see datasheet) */
     uint8_t CMD;
-    // Servo ID
+    /** Servo ID */
     uint8_t pID;
-    // Checksum1 result (see datasheet)
+    /** Checksum1 result (see datasheet) */
     uint8_t cs1;
-    // Checksum2 result (see datasheet)
+    /** Checksum2 result (see datasheet) */
     uint8_t cs2;
-    // Packet header (see datasheet)
+    /** Packet header (see datasheet) */
     std::vector<uint8_t> header = std::vector<uint8_t> (2);
-    // Actual data of the packet (see datasheet)
+    /** Actual data of the packet (see datasheet) */
     std::vector<uint8_t> data = std::vector<uint8_t> (1);
-    // ACK packet, stores the ACK sent by the servo (see datasheet)
+    /** ACK packet, stores the ACK sent by the servo (see datasheet) */
     std::vector<uint8_t> ack_packet = std::vector<uint8_t> (15);
     
-    // Verbosity
+    /* Verbosity attribute. It allow displaying the data that has been
+      sent or has been received. */
     int verbosity;
 
-    // Methods
-    
-    // Writes the data to serial port using PorHandler member
+    /* Methods */
+    /** Writes the data to serial port using the PorHandler member */
     int sendTx ();
-    // Writes to and reads from serial port using PorHandler member
+    /** Writes the data to and reads the data from serial port using
+      the PorHandler member */
     int sendTxRx (int ack_length);
-    // Builds up the packet adding the header and the checksums (see datasheet)
+    /** Builds up the packet adding the header and the checksums (see
+      datasheet) */
     int buildUp (std::vector<uint8_t> bytes);
-    // Checksums methods for error checking (see datasheet)
+    /** Checksum1 method for error checking (see datasheet) */
     uint8_t checkSum1 (std::vector<uint8_t> bytes);
+    /** Checksum2 method for error checking (see datasheet) */
     uint8_t checkSum2 ();
 
   public:
-    // Constructors
+    /* Constructors */
+    /** Default constructor.
+      The default constructor sets 115200 bps as the baudrate, sets the
+      verbosity attribute as 1 and initializes the buffer with zeros
+      and the header. */
     PacketManager ();
+    /** Constructor with verbosity paramater.
+      This constructor sets 115200 bps as the baudrate and
+      initializes the buffer with zeros and the header. */
     PacketManager (const int& verb);
-    PacketManager (char* port_name, const int& baudrate, const int& verb);
+    /** Default constructor.
+      The default constructor sets 115200 bps as the baudrate and
+      initializes the buffer with zeros and the header. */
+    PacketManager (char* port_name, const int& baudrate,
+      const int& verb);
     virtual ~PacketManager () { }
 
-    // Sends the packet (this method interacts with the ServoHerkulex object directly)
+    /** Sends the packet (this method interacts with the ServoHerkulex
+      object directly). */
     int sendPacket (std::vector<uint8_t> buf, int ID);
-    // Sends the packet and reads the ACK (this method interacts with the ServoHerkulex object directly)
-    int sendreceivePacket (std::vector<uint8_t> buf, int ack_length, int ID);
+    /** Sends the packet and reads the ACK (this method interacts with
+      the ServoHerkulex object directly). */
+    int sendreceivePacket (std::vector<uint8_t> buf, int ack_length,
+      int ID);
 
-    // Debug methods (get the instruction packet and ACK packet, respectively)
+    /** Gets the instruction packet (For debug purposes). */
     std::vector<uint8_t> getData () const;
+    /** Gets the ACK packet  (For debug purposes). */
     std::vector<uint8_t> getAckPacket () const;
-
+    /** Disables the device communication */
     void endPacketManager ();
 };
 
