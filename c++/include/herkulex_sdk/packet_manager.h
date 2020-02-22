@@ -191,27 +191,39 @@ class PacketManager
       and the header. */
     PacketManager ();
     /** Constructor with verbosity paramater.
-      This constructor sets 115200 bps as the baudrate and
-      initializes the buffer with zeros and the header. */
+      This constructor sets 115200 bps as the baudrate, takes the
+      verbosity parameters in and initializes the buffer with zeros and
+      the header.
+      \param verb Verbosity flag (0 or 1) for printing out the content
+      of the packet to console. */
     PacketManager (const int& verb);
-    /** Default constructor.
-      The default constructor sets 115200 bps as the baudrate and
-      initializes the buffer with zeros and the header. */
+    /** Constructor with port name, verbosity and baudrate paramaters.
+      Takes the parameters in and initializes the buffer with zeros and
+      the header.
+      \param port_name The label of the device for communication.
+      \param baudrate The baudrate in bps e.g.115200.
+      \param verb Verbosity flag (0 or 1) for printing out the content
+      of the packet to console. */
     PacketManager (char* port_name, const int& baudrate,
       const int& verb);
     virtual ~PacketManager () { }
 
     /** Sends the packet (this method interacts with the ServoHerkulex
-      object directly). */
+      object directly)
+      \param buf The HerkuleX packet to be sent.
+      \param ID THe ID of the servo. */
     int sendPacket (std::vector<uint8_t> buf, int ID);
     /** Sends the packet and reads the ACK (this method interacts with
-      the ServoHerkulex object directly). */
+      the ServoHerkulex object directly)
+      \param buf The HerkuleX packet to be sent.
+      \param ack_length The length of the ACK packet to be received.
+      \param ID THe ID of the servo. */
     int sendreceivePacket (std::vector<uint8_t> buf, int ack_length,
       int ID);
 
-    /** Gets the instruction packet (For debug purposes). */
+    /** Gets the instruction packet (for debug purposes). */
     std::vector<uint8_t> getData () const;
-    /** Gets the ACK packet  (For debug purposes). */
+    /** Gets the ACK packet  (for debug purposes). */
     std::vector<uint8_t> getAckPacket () const;
     /** Disables the device communication */
     void endPacketManager ();

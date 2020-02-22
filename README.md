@@ -12,7 +12,7 @@ sudo apt-get install build-essential
 
 ### Installing
 
-Upon downloading the repo, on the *build* directory run the command
+Upon downloading the repo, in the *build* directory run the command
 
 ```
 make
@@ -45,4 +45,4 @@ This project is licensed under the BSD 3-Clause License - see the [LICENSE.md](L
 
 ## Note
 
-* The HerkuleX trademark is property of HYULIMROBOT. This SDK intends to be an API for developers and is free software.
+* The HerkuleX trademark is property of [HYULIMROBOT](http://www.dstrobot.com/). This SDK intends to be an API for developers and is free software.
