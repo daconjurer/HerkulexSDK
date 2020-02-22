@@ -34,7 +34,7 @@
  *********************************************************************/
 
 /**
-  \file
+  \file servo_herkulex.h
   \brief ServoHerkulex class definition.
 */
 
