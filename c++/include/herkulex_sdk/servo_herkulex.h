@@ -244,70 +244,96 @@ class ServoHerkulex
 
   public:
     /* Constructors */
-    /** */
+    /** Default constructor.
+      The default constructor sets 115200 bps as the baudrate and sets
+      the verbosity attribute as 1. */
     ServoHerkulex (const int& verb);
-    /** */
-    ServoHerkulex (char* port_name, const int& baudrate, const int& verb);
+    /** Constructor with port name, baudrate and verbosity parameters.
+      \param port_name The label of the device used for the
+      communication with the servos
+      \param baudrate The baudrate in bps e.g. 115200.
+      \param verbosity The verbosity flag (0 or 1). */
+    ServoHerkulex (char* port_name, const int& baudrate,
+      const int& verb);
 
     /* Hovis HerkuleX servos class */
-    /** */
+    /** It sends the reboot packet (see datasheet).
+      \param ID The ID of the servo. */
     bool reboot (int sID);
-    /** */
+    /** It performs a ping through the line to all the
+      servos (from 0 to 255) and prints the IDs of the servos that are
+      connected. */
     bool ping ();
-    /** */
+    /** It changes the ID of the servo.
+      \param cID The current ID of the servo.
+      \param nID The new ID of the servo. */
     bool setID (int cID, int nID);
-    /** */
+    /** It clears the error flag of the servo (see datasheet).
+      \param tID The ID of the servo. */
     bool clearError (int tID);
-    /** */
+    /** It gets the error status of the servo (see datasheet).
+      \param tID The ID of the servo. */
     std::vector<uint8_t> getStatus (int tID);
-    /** */
+    /** It sets the ACK policy (see datasheet).
+      \param tID the ID of the servo. */
     bool setACK (int tID);
-    /** */
+    /** It enables the torque of the motor.
+      \param tID the ID of the servo. */
     bool torqueOn (int tID);
-    /** */
+    /** It disables the torque of the motor.
+      \param tID the ID of the servo. */
     bool torqueOff (int tID);
-    /** */
+    /** It enables and sets the color of the servo's' LED.
+      \param tLED The color code.
+      \param tID The ID of the servo. */
     bool setLED (int tLED, int tID);
-
-    /** */
+    /** It stops a DRS-0201 servo that is moving at constant speed. */
     bool stopSpeedO201 (int tID, int tLED);
-
-    /** */
+    /** It moves a DRS-0601 servo to the given angle in the given
+      playtime. */
     bool moveAngle0601 (int goal, int tID, int tLED, float playtime);
-    /** */
+    /** It moves a DRS-0201 servo to the given angle in the given
+      playtime. */
     bool moveAngle0201 (int goal, int tID, int tLED, float playtime);
-
-    /** */
+    /** It moves a servo at the given speed in the given playtime. */
     bool moveSpeed0201 (int speed, int tID, int tLED, float playtime);
-
-    /** */
+    /** It moves a group of servos at the given speed in the given
+      playtime. */
     bool moveSyncSpeed (std::vector<int> speed, std::vector<int> tID,
       std::vector<int> tLED, float playtime);
-
-    /** */
+    /** It moves a group of servos to the given angles in the given
+      playtime. */
     bool moveSync (std::vector<int> goal, std::vector<int> tID,
       std::vector<int> tLED, float playtime);
-    /** */
+    /** It moves a group of servos to the given angles, each one in the
+      respective playtime. */
     bool moveAsync (std::vector<int> goal, std::vector<int> tID,
       std::vector<int> tLED, std::vector<float> playtime);
 
-    /** */
+    /** It gets the models of the servos that are connected. */
     std::vector<std::string> getModels ();
-    /** */
+    /** It gets the IDs of the servos that are connected. */
     std::vector<int> getIDs () const;
-    /** */
+    /** It gets the angular position (in degrees) of the DRS-0601 servo.
+      \param tID The ID of the servo. */
     float getAngle0601 (int tID);
-    /** */
+    /** It gets the angular position (in degrees) of the DRS-0201 servo.
+      \param tID The ID of the servo. */
     float getAngle0201 (int tID);
-    /** */
+    /** It gets the angular speed (in bits) of the servo (DRS-0201
+      and DRS-0601).
+      \param tID The ID of the servo. */
     int getSpeed (int tID);
 
-    /** */
+    /** It gets the angular position (in bits) of the DRS-0201 servo.
+      \param tID The ID of the servo. */
     uint16_t getPosition0201 (int tID);
-    /** */
+    /** It gets the angular position (in bits) of the DRS-0601 servo.
+      \param tID The ID of the servo. */
     uint16_t getPosition0601 (int tID);
 
-    /** Disables the device communication */
+    /** Disables the device communication through the PacketManager
+      attribute. */
     void closeHerkulex ();
 };
 
