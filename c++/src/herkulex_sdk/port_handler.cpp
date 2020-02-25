@@ -33,11 +33,11 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
  
-/*
-   @file PortHandler class implementation. This class allow serial port
-   read/write non-canonical control. It is intended to be used with
+/**
+   \file PortHandler class implementation. This class allows serial port
+   read/write non-canonical operations. It is intended to be used with
    FTDI USB-to-TTL converters.
-   @author Victor Esteban Sandoval-Luna
+   \author Victor Esteban Sandoval-Luna
 */
 
 #include "../../include/herkulex_sdk/port_handler.h"
