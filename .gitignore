@@ -13,5 +13,6 @@ c++/example/polymorphism/
 c+/example/test/test.cpp
 c++/example/read_write/read_write
 c++/example/read_write/.objects/
+c++/example/test/
 html/
 latex/
