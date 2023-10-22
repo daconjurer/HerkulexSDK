@@ -10,25 +10,14 @@ The library is compiled with ```make``` using ```GCC```. Therefore ```build-esse
 sudo apt-get install build-essential
 ```
 
-### Installing
-
-Upon downloading the repo, in the *build* directory run the command
+## Build and Install
 
 ```
-make
+mkdir build && cd build && cmake .. && sudo make install
 ```
 
-to compile the dynamic library. And then
 
-```
-sudo make install
-```
-
-to install the library on your */usr/local/* directory. Then you can start using the library by including the header *"herkulex_sdk.h"* in your *.cpp* files.
-
-## Running the examples
-
-The *example* directory includes some examples using the library. To create a new example just create a new folder *example_folder* and copy one of the existing *makefiles*, replacing the *TARGET* name. Every example is compiled using the command ```make``` on the corresponding *example_folder* folder.
+Then you can start using the library by including the header *"herkulex_sdk.h"* in your *.cpp* files.
 
 ## Authors
 

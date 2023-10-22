@@ -1,0 +1,5 @@
+- ~~Migrate build to CMake~~
+- Add tests
+- Create protocol class
+- Create class for port handling
+- Create commands for communication
