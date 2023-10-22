@@ -1,5 +1,5 @@
-- Migrate build to CMake
+- ~~Migrate build to CMake~~
+- Add tests
 - Create protocol class
 - Create class for port handling
-- Create commands for connection
-
+- Create commands for communication
